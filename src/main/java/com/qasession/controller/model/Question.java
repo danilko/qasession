@@ -1,8 +1,19 @@
 package com.qasession.controller.model;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.util.Calendar;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
+@Entity
+@Table(name="QUESTION")
 public class Question implements Serializable 
 {
 	/**
@@ -10,17 +21,29 @@ public class Question implements Serializable
 	 */
 	private static final long serialVersionUID = 2217994381777064845L;
 
+	@Column(name = "SESSION_ID") 
 	private String sessionId;
 	
+	@Id
+	@Column(name = "QUESTION_ID", unique = true, nullable = false)  
 	private String questionId;
-	private String content;
+	
+	@Column(name = "QUESTION_CONTENT") 
+	private String questionContent;
+	
+	@OneToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="QUESTION_ID")
 	private Answer answer;
 	
+	@Column(name = "QUESTION_STATUS") 
 	private String questionStatus;
 	
-    private Attendee author;
+	@Column(name = "CREATED_BY") 
+    private String createdBy;
     
-    private Date lastModifiedDate;
+	@Column(name = "UPDATE_DATE", nullable = false)  
+	@Temporal(TemporalType.DATE) 
+    private Calendar updateDate;
 	
 	public String getSessionId() {
 		return sessionId;
@@ -38,13 +61,13 @@ public class Question implements Serializable
 		this.questionId = questionId;
 	}  // void setQuestionId
 
-	public String getContent() {
-		return content;
-	}  // String getContent
+	public String getQuestionContent() {
+		return questionContent;
+	}  // String getQuestionContent
 
-	public void setContent(String content) {
-		this.content = content;
-	}  // void setContent
+	public void setQuestionContent(String questionContent) {
+		this.questionContent = questionContent;
+	}  // void setQuestionContent
 
 	public Answer getAnswer() {
 		return answer;
@@ -54,21 +77,13 @@ public class Question implements Serializable
 		this.answer = answer;
 	}  // void setAnswer
 
-	public Date getLastModifiedDate() {
-		return lastModifiedDate;
+	public Calendar getUpdateDate() {
+		return updateDate;
 	}  // Date getLastModifiedDate
 
-	public void setLastModifiedDate(Date lastModifiedDate) {
-		this.lastModifiedDate = lastModifiedDate;
-	}  // void setLastModifiedDate
-
-	public Attendee getAuthor() {
-		return author;
-	}  // Attendee getAuthor
-
-	public void setAuthor(Attendee author) {
-		this.author = author;
-	}  // void setAuthor
+	public void setUpdateDate(Calendar calendar) {
+		this.updateDate = calendar;
+	}  // void setUpdateDate
 
 	public String getQuestionStatus() {
 		return questionStatus;
@@ -77,4 +92,12 @@ public class Question implements Serializable
 	public void setQuestionStatus(String questionStatus) {
 		this.questionStatus = questionStatus;
 	}  // void setQuestionStatus
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+	
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
 }  // class Question

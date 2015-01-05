@@ -1,8 +1,17 @@
 package com.qasession.controller.model;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.util.Calendar;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+
+@Entity
+@Table(name="ANSWER")
 public class Answer implements Serializable
 {
 
@@ -11,12 +20,29 @@ public class Answer implements Serializable
 	 */
 	private static final long serialVersionUID = -2033509333352468767L;
 	
+	@Column(name = "QUESTION_ID", unique = true, nullable = false) 
+	private String questionId;
+	
+	@Column(name = "ANSWER_ID", unique = true, nullable = false) 
 	private String answerId;
+	
+	@Column(name = "ANSWER_CONTENT") 
     private String content;
 	
-    private Attendee author;
+	@Column(name = "CREATED_BY") 
+    private String createdBy;
     
-    private Date lastModifiedDate;
+	@Column(name = "UPDATE_DATE", nullable = false) 
+	@Temporal(TemporalType.DATE) 
+	private Calendar updateDate;
+	
+	public String getQuestionId() {
+		return questionId;
+	}
+
+	public void setQuestionId(String questionId) {
+		this.questionId = questionId;
+	}
 	
     public String getAnswerId() {
 		return answerId;
@@ -26,13 +52,13 @@ public class Answer implements Serializable
 		this.answerId = answerId;
 	}  // void setAnswerId
 	
-	public Date getLastModifiedDate() {
-		return lastModifiedDate;
-	}  // getLastModifiedDate
+	public Calendar getUpdateDate() {
+		return updateDate;
+	}  // getUpdateDate
 
-	public void setLastModifiedDate(Date lastModifiedDate) {
-		this.lastModifiedDate = lastModifiedDate;
-	}  // void setLastModifiedDate
+	public void setUpdateDate(Calendar updateDate) {
+		this.updateDate = updateDate;
+	}  // void setUpdateDate
 
 	public String getContent() {
 		return content;
@@ -41,12 +67,13 @@ public class Answer implements Serializable
 	public void setContent(String content) {
 		this.content = content;
 	}  // void setContent
+	
+	public String getCreatedBy() {
+		return createdBy;
+	}
 
-	public Attendee getAuthor() {
-		return author;
-	}  // Attendee getAuthor
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
 
-	public void setAuthor(Attendee author) {
-		this.author = author;
-	}  // void setAuthor
 }  // class Answer

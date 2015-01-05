@@ -1,21 +1,32 @@
 package com.qasession.controller.model;
 
 import java.io.Serializable;
+import java.util.Calendar;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+@Entity
+@Table(name="ATTENDEE")
 public class Attendee implements Serializable
 {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 223575325135709928L;
 
-	private Session sessionId;
+	@Column(name = "SESSION_ID") 
+	private String sessionId;
 	
+	@Column(name = "ATTENDEE_EMAIL") 
 	private String email;
-
-	private String role;
 	
+	@Column(name = "SESSION_ROLE") 
+	private String sessionRole;
+	
+	@Column(name = "UPDATE_DATE", nullable = false) 
+	@Temporal(TemporalType.DATE) 
+	private Calendar updateDate;
 	
 	public String getEmail() {
 		return email;
@@ -25,20 +36,20 @@ public class Attendee implements Serializable
 		this.email = email;
 	}  // void setEmail
 
-	public Session getSessionId() 
+	public String getSessionId() 
 	{
 		return sessionId;
 	}  // getSessionId
 
-	public void setSessionId(Session sessionId) {
+	public void setSessionId(String sessionId) {
 		this.sessionId = sessionId;
 	}  // setSessionId
 
-	public String getRole() {
-		return role;
-	}  // String getRole
+	public String getSessionRole() {
+		return sessionRole;
+	}  // String getSessionRole
 
-	public void setRole(String role) {
-		this.role = role;
-	}  // void setRole
+	public void setSessionRole(String sessionRole) {
+		this.sessionRole = sessionRole;
+	}  // void setSessionRole
 }  // class Attendee
