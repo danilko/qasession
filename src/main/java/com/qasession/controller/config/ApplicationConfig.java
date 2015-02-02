@@ -55,6 +55,7 @@ public class ApplicationConfig {
 	{
 		return new SessionService();
 	}  // public
+
 	
 	@Bean
 	public Server initJAXRSServer() {
@@ -63,8 +64,8 @@ public class ApplicationConfig {
 		lFactory.setServiceBeans(Arrays.<Object>asList(getSessionService(), getAnswerService(), getQuestionService(), getAttendeeService()));
 		
 		lFactory.setAddress(lFactory.getAddress());
-
-		lFactory.setProvider(getJSONProvider());
+	
+		lFactory.setProviders(Arrays.<Object>asList(getJSONProvider()));
 		
 		return lFactory.create();
 	}  // Server initJAXRSServer

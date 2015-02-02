@@ -12,7 +12,6 @@ import org.apache.cxf.transport.servlet.CXFServlet;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-import org.springframework.web.filter.DelegatingFilterProxy;
 
 
 public class MainWebAppplicationInitializer implements
@@ -21,9 +20,8 @@ public class MainWebAppplicationInitializer implements
 	public void onStartup(ServletContext pServletContext) throws ServletException 
 	{
 		// Apply Spring OAuthSecurity to both forward and request dispatcher
-		FilterRegistration.Dynamic lFilter = pServletContext.addFilter("securityFilter",
-				new DelegatingFilterProxy("springSecurityFilterChain"));
-		lFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD), true, "/*");
+		FilterRegistration.Dynamic lFilter = pServletContext.addFilter("securityFilter", "com.qasession.controller.security.SecurityFilter");
+		lFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD), true, "/rest/*");
 		
 		// Create the 'root' Spring application context
 		AnnotationConfigWebApplicationContext lRootContext = new AnnotationConfigWebApplicationContext();
@@ -38,9 +36,5 @@ public class MainWebAppplicationInitializer implements
 				"CFXServlet", CXFServlet.class);
 		lDispatcher.addMapping("/rest/*");
 		
-
-		
-		//registerProxyFilter(pServletContext, "springSecurityFilterChain", "/*");
-		//registerProxyFilter(pServletContext, "oauth2ClientContextFilter", "/*");
 	}
 } // class MainWebApplicationInitializer
