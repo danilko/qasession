@@ -20,7 +20,7 @@ import com.wordnik.swagger.annotations.ApiResponse;
 @Produces("application/json")
 
 public class AttendeeService {
-	@Resource
+	@Resource(shareable=true, name="getAttendeeDao")
 	private AttendeeDao mAttendeeDao;
 	
 	@GET

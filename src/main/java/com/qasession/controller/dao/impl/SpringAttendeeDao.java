@@ -7,9 +7,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
+import org.springframework.stereotype.Repository;
+
 import com.qasession.controller.dao.AttendeeDao;
 import com.qasession.controller.model.Attendee;
 
+@Repository
 public class SpringAttendeeDao implements AttendeeDao
 {
 	@PersistenceContext

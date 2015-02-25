@@ -8,10 +8,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
+import org.springframework.stereotype.Repository;
+
 import com.qasession.controller.dao.QuestionDao;
 import com.qasession.controller.model.Question;
 import com.qasession.controller.utility.RandomStringGenerator;
 
+@Repository
 public class SpringQuestionDao implements QuestionDao
 {
 	@PersistenceContext

@@ -20,7 +20,7 @@ import com.wordnik.swagger.annotations.ApiResponses;
 @Produces("application/json")
 @Path("/session")
 public class SessionService {
-	@Resource
+	@Resource(shareable=true, name="getSessionDao")
 	private SessionDao mSessionDao;
 
 	@GET

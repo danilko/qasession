@@ -20,7 +20,7 @@ import com.wordnik.swagger.annotations.ApiResponse;
 @Produces("application/json")
 @Path("/session/{sessionId}/question/{questionId}/answer")
 public class AnswerService {
-	@Resource
+	@Resource(shareable=true, name="getAnswerDao")
 	private AnswerDao mAnswerDao;
 	
 	@GET

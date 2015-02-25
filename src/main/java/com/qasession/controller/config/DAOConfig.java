@@ -16,6 +16,14 @@ import org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.jolbox.bonecp.BoneCPDataSource;
+import com.qasession.controller.dao.AnswerDao;
+import com.qasession.controller.dao.AttendeeDao;
+import com.qasession.controller.dao.QuestionDao;
+import com.qasession.controller.dao.SessionDao;
+import com.qasession.controller.dao.impl.SpringAnswerDao;
+import com.qasession.controller.dao.impl.SpringAttendeeDao;
+import com.qasession.controller.dao.impl.SpringQuestionDao;
+import com.qasession.controller.dao.impl.SpringSessionDao;
 
 @Configuration
 @PropertySource(value="classpath:application.properties")
@@ -24,6 +32,36 @@ public class DAOConfig
 	// Inject PropertySource into environment instance
 	@Inject
 	private Environment mEnvironment;
+	
+	@Bean
+	public AnswerDao getAnswerDao() {
+		return new SpringAnswerDao();
+	}  // AnswerDao getAnswerDao
+
+	@Bean
+	public AttendeeDao getAttendeeDao()
+	{
+		return new SpringAttendeeDao();
+	}  // AttendeeDAO  getAttendeeDao
+
+	@Bean
+	public QuestionDao getQuestionDao()
+	{
+		return new SpringQuestionDao();
+	}  // QuestionDao getQuestionDao
+	
+	@Bean
+	public SessionDao getSessionDao()
+	{
+		return new SpringSessionDao();
+	}  // SessionDao getSessionDao
+	
+	
+	@Bean
+	public AnswerDao getSpringAnswerDAO()
+	{
+		return new SpringAnswerDao();
+	}  // Account getUser
 	
 	@Bean
 	public JpaVendorAdapter getJpaVendorAdapter()

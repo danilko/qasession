@@ -33,17 +33,19 @@ public class ApplicationConfig {
     }
     
 	@Bean
-	public QuestionService getQuestionService()
-	{
-		return new QuestionService();
-	}  // public
-    
-	@Bean
 	public AnswerService getAnswerService()
 	{
 		return new AnswerService();
 	}  // public
     
+    
+	@Bean
+	public QuestionService getQuestionService()
+	{
+		return new QuestionService();
+	}  // public
+    
+	
 	@Bean
 	public AttendeeService getAttendeeService()
 	{

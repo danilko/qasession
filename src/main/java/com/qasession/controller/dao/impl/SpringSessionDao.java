@@ -8,10 +8,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
+import org.springframework.stereotype.Repository;
+
 import com.qasession.controller.dao.SessionDao;
 import com.qasession.controller.model.Session;
 import com.qasession.controller.utility.RandomStringGenerator;
 
+@Repository
 public class SpringSessionDao implements SessionDao
 {
 	@PersistenceContext

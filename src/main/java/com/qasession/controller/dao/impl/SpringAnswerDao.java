@@ -8,12 +8,14 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.qasession.controller.dao.AnswerDao;
 import com.qasession.controller.model.Answer;
 import com.qasession.controller.utility.RandomStringGenerator;
 
+@Repository
 public class SpringAnswerDao implements AnswerDao
 {
 	@PersistenceContext
