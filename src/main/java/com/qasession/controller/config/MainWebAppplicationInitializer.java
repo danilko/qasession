@@ -21,7 +21,7 @@ public class MainWebAppplicationInitializer implements
 	{
 		// Apply Spring OAuthSecurity to both forward and request dispatcher
 		FilterRegistration.Dynamic lFilter = pServletContext.addFilter("securityFilter", "com.qasession.controller.security.SecurityFilter");
-		lFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD), true, "/rest/*");
+		lFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD), true, "/*");
 		
 		// Create the 'root' Spring application context
 		AnnotationConfigWebApplicationContext lRootContext = new AnnotationConfigWebApplicationContext();

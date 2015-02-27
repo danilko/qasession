@@ -16,6 +16,7 @@ import com.qasession.controller.service.AnswerService;
 import com.qasession.controller.service.AttendeeService;
 import com.qasession.controller.service.QuestionService;
 import com.qasession.controller.service.SessionService;
+import com.qasession.controller.service.UserService;
 
 @Configuration
 public class ApplicationConfig {
@@ -25,45 +26,51 @@ public class ApplicationConfig {
 	public SpringBus cxf()
 	{
 		return new SpringBus();
-	}  // SpringBus cxf
+	}  // public SpringBus cxf
 	
     @Bean
     public JacksonJsonProvider getJSONProvider() {
         return new JacksonJsonProvider();
-    }
+    }  // public JacksonJsonProvider getJSONProvider()
     
 	@Bean
 	public AnswerService getAnswerService()
 	{
 		return new AnswerService();
-	}  // public
+	}  // public AnswerService getAnswerService()
     
     
 	@Bean
 	public QuestionService getQuestionService()
 	{
 		return new QuestionService();
-	}  // public
+	}  // public QuestionService getQuestionService()
     
 	
 	@Bean
 	public AttendeeService getAttendeeService()
 	{
 		return new AttendeeService();
-	}  // public
+	}  // public AttendeeService getAttendeeService()
 	
 	@Bean
 	public SessionService getSessionService()
 	{
 		return new SessionService();
-	}  // public
+	}  // public SessionService getSessionService()
+
+	@Bean
+	public UserService getUserService()
+	{
+		return new UserService();
+	}  // public UserService getUserService()
 
 	
 	@Bean
 	public Server initJAXRSServer() {
 		JAXRSServerFactoryBean lFactory = RuntimeDelegate.getInstance().createEndpoint(new Application(),
 				JAXRSServerFactoryBean.class);
-		lFactory.setServiceBeans(Arrays.<Object>asList(getSessionService(), getAnswerService(), getQuestionService(), getAttendeeService()));
+		lFactory.setServiceBeans(Arrays.<Object>asList(getSessionService(), getAnswerService(), getQuestionService(), getAttendeeService(), getUserService()));
 		
 		lFactory.setAddress(lFactory.getAddress());
 	

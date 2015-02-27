@@ -7,23 +7,23 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import com.qasession.controller.security.FacebookClient;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 
 @Produces("application/json")
-@Path("/session/{sessionId}/question/{questionId}/answer")
-public class TokenService {
+@Path("/user")
+public class UserService {
 	
 	@GET
-	@Path("/token")
-	@ApiOperation(value = "Find attendee by attendee email", notes = "Returns all attendee record that this session belong")
+	@ApiOperation(value = "Get current token info", notes = "Returns all attendee record that this session belong")
 	@ApiResponses(value = { @ApiResponse(code = 404, message = "Attendee ID not found"), @ApiResponse(code = 403, message = "Not authorized") })
 	public Response getCurrentUserInfo(@Context HttpServletRequest pHttpServletRequest ) {
 		try {
 			return Response
 					.ok()
-					.entity(pHttpServletRequest.getSession().getAttribute("qa_session_token_info")).build();
+					.entity(pHttpServletRequest.getSession().getAttribute(FacebookClient.getUserInfoSessionId())).build();
 		} // try
 		catch (Exception pExeception) {
 			return Response.serverError().build();
