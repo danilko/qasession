@@ -18,13 +18,13 @@ import com.qasession.controller.utility.RandomStringGenerator;
 @Repository
 public class SpringAnswerDao implements AnswerDao
 {
-	@PersistenceContext
+	@PersistenceContext(unitName = "getEntityManagerFactoryBean")
 	private EntityManager mEntityManager;
-	
+
 	@Transactional(rollbackFor = Throwable.class)
 	public List<Answer> getAnswerByKeyValue(String pKeyName, String pKeyValue) throws Exception {
 			// Create query to find session info
-			String lBasedQuery = "SELECT answer_object FROM answer answer_object WHERE answer_object." + pKeyName.toLowerCase() + " LIKE :pKeyValue";
+			String lBasedQuery = "SELECT answer_object FROM Answer answer_object WHERE answer_object." + pKeyName + " LIKE :pKeyValue";
 			
 			Query lQuery = mEntityManager.createQuery(lBasedQuery);
 			lQuery = lQuery.setParameter("pKeyValue", pKeyValue);
@@ -50,6 +50,7 @@ public class SpringAnswerDao implements AnswerDao
 			return lLists;
 	}  // List<Answer> getAnswerByKeyValue
  
+	@Transactional(rollbackFor = Throwable.class)
 	public Answer createAnswer(Answer pAnswer) throws Exception  {
 		Answer newAnswer = new Answer();
 		newAnswer.setAnswerId(RandomStringGenerator.generator(RandomStringGenerator.ID_LENTH));
@@ -63,10 +64,12 @@ public class SpringAnswerDao implements AnswerDao
 		return pAnswer;
 	}
 
+	@Transactional(rollbackFor = Throwable.class)
 	public void deleteAnswerById(String pAnswerId) throws Exception {
 		mEntityManager.remove(getAnswerById(pAnswerId));
 	}  // void deleteAnswerById
 
+	@Transactional(rollbackFor = Throwable.class)
 	public Answer updateAnswerById(Answer pAnswer) throws Exception {
 		Answer oldAnswer = getAnswerById(pAnswer.getAnswerId());
 		oldAnswer.setCreatedBy(pAnswer.getCreatedBy());
@@ -79,24 +82,14 @@ public class SpringAnswerDao implements AnswerDao
 	}  // Answer updateAttendeeById
 
 	public Answer getAnswerById(String pAnswerId) throws Exception {
-		// Create query to find info
-		String lBasedQuery = "SELECT answer_object FROM answer answer_object WHERE answer_object.answer_id LIKE :pAnswerId";
+		List<Answer> lList = getAnswerByKeyValue("answerId", pAnswerId);
 		
-		Query lQuery = mEntityManager.createQuery(lBasedQuery);
-		lQuery = lQuery.setParameter("pAnswerId", pAnswerId);
-
-		Object lObject = lQuery.getResultList().get(0);
+		if(lList.size() > 0)
+		{
+			return lList.get(0);
+		}  // if
 		
-		// Check items in list and cast to account only if it is an instance
-		// of
-		// account object
-		// Throw exception if there is an cast error
-		if (lObject instanceof Answer) {
-			return ((Answer) lObject);
-		} // if
-		else {
-				throw new ClassCastException();
-		} // else
+		return null;
 	}  // Answer getAnswerById
 
 }

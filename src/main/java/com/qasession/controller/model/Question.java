@@ -2,18 +2,28 @@ package com.qasession.controller.model;
 
 import java.io.Serializable;
 import java.util.Calendar;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 @Entity
 @Table(name="QUESTION")
+@JsonIdentityInfo(generator=com.fasterxml.jackson.annotation.ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Question implements Serializable 
 {
 	/**
@@ -21,9 +31,11 @@ public class Question implements Serializable
 	 */
 	private static final long serialVersionUID = 2217994381777064845L;
 
-	@Column(name = "SESSION_ID") 
-	private String sessionId;
-	
+	@JsonBackReference(value="session-question")
+	@JoinColumn(name="SESSION_ID")
+	@ManyToOne(fetch = FetchType.EAGER)
+	private Session session;
+
 	@Id
 	@Column(name = "QUESTION_ID", unique = true, nullable = false)  
 	private String questionId;
@@ -31,6 +43,7 @@ public class Question implements Serializable
 	@Column(name = "QUESTION_CONTENT") 
 	private String questionContent;
 	
+	@JsonBackReference(value="question-answer")
 	@OneToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="QUESTION_ID")
 	private Answer answer;
@@ -44,14 +57,14 @@ public class Question implements Serializable
 	@Column(name = "UPDATE_DATE", nullable = false)  
 	@Temporal(TemporalType.DATE) 
     private Calendar updateDate;
-	
-	public String getSessionId() {
-		return sessionId;
-	}  // String getSessionId
 
-	public void setSessionId(String sessionId) {
-		this.sessionId = sessionId;
-	}  // void setSessionId
+	public Session getSession() {
+		return session;
+	}
+
+	public void setSession(Session session) {
+		this.session = session;
+	}
 
 	public String getQuestionId() {
 		return questionId;

@@ -5,21 +5,40 @@ import java.util.Calendar;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 @Entity
 @Table(name="ATTENDEE")
+@JsonIdentityInfo(generator=com.fasterxml.jackson.annotation.ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Attendee implements Serializable
 {
 	private static final long serialVersionUID = 223575325135709928L;
 
-	@Column(name = "SESSION_ID") 
-	private String sessionId;
+	@Id
+	@Column(name = "ATTENDEE_ID") 
+	private String attendeeId;
+
+
+	@JoinColumn(name="SESSION_ID")
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JsonBackReference(value="session-attendee")
+	private Session session;
 	
-	@Column(name = "ATTENDEE_EMAIL") 
-	private String email;
+	@Column(name = "USER_ID") 
+	private String userId;
 	
 	@Column(name = "SESSION_ROLE") 
 	private String sessionRole;
@@ -28,22 +47,38 @@ public class Attendee implements Serializable
 	@Temporal(TemporalType.DATE) 
 	private Calendar updateDate;
 	
-	public String getEmail() {
-		return email;
-	}  // String getEmail
+	
+	public String getAttendeeId() {
+		return attendeeId;
+	}
 
-	public void setEmail(String email) {
-		this.email = email;
-	}  // void setEmail
+	public void setAttendeeId(String attendeeId) {
+		this.attendeeId = attendeeId;
+	}
+	
+	public Session getSession() {
+		return session;
+	}
 
-	public String getSessionId() 
-	{
-		return sessionId;
-	}  // getSessionId
+	public void setSession(Session session) {
+		this.session = session;
+	}
+	
+	public Calendar getUpdateDate() {
+		return updateDate;
+	}
 
-	public void setSessionId(String sessionId) {
-		this.sessionId = sessionId;
-	}  // setSessionId
+	public void setUpdateDate(Calendar updateDate) {
+		this.updateDate = updateDate;
+	}
+
+	public String getUserId() {
+		return userId;
+	}  // String getUserId
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}  // void setUserId
 
 	public String getSessionRole() {
 		return sessionRole;

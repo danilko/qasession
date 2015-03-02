@@ -8,20 +8,23 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.qasession.controller.dao.AttendeeDao;
 import com.qasession.controller.model.Attendee;
+import com.qasession.controller.utility.RandomStringGenerator;
 
 @Repository
 public class SpringAttendeeDao implements AttendeeDao
 {
-	@PersistenceContext
+	@PersistenceContext(unitName = "getEntityManagerFactoryBean")
 	private EntityManager mEntityManager;
-	
+
+	@Transactional(rollbackFor = Throwable.class)
 	public List<Attendee> getAttendeeByKeyValue(String pKeyName,
 			String pKeyValue) {
 		// Create query to find info
-		String lBasedQuery = "SELECT attendee_object FROM attendee attendee_object WHERE attendee_object." + pKeyName.toLowerCase() + " LIKE :pKeyValue";
+		String lBasedQuery = "SELECT attendee_object FROM Attendee attendee_object WHERE attendee_object." + pKeyName + " LIKE :pKeyValue";
 		
 		Query lQuery = mEntityManager.createQuery(lBasedQuery);
 		lQuery = lQuery.setParameter("pKeyValue", pKeyValue);
@@ -47,16 +50,20 @@ public class SpringAttendeeDao implements AttendeeDao
 		return lLists;
 	}  // List <Attendee> getAttendeeByKeyValue
 
+	@Transactional(rollbackFor = Throwable.class)
 	public Attendee createAttendee(Attendee pAttendee) throws Exception
 	{
+		pAttendee.setAttendeeId(RandomStringGenerator.generator(RandomStringGenerator.ID_LENTH));
+		
 		mEntityManager.persist(pAttendee);
 		
 		return pAttendee;
 	}  // Attendee createAttendee
 
+	@Transactional(rollbackFor = Throwable.class)
 	public Attendee updateAttende(Attendee pAttendee) throws Exception
 	{
-		Attendee oldAttendee = getAttendeeBySessionIdAttendeeEmail(pAttendee.getSessionId(), pAttendee.getEmail());
+		Attendee oldAttendee = getAttendeeBySessionIdUserId(pAttendee.getSession().getSessionId(), pAttendee.getUserId());
 		
 		oldAttendee.setSessionRole(pAttendee.getSessionRole());
 		
@@ -65,32 +72,45 @@ public class SpringAttendeeDao implements AttendeeDao
 		return oldAttendee;
 	}  // Attendee updateAttende
 
-	public Attendee getAttendeeBySessionIdAttendeeEmail(String pSessionId,
-			String pAttendeeEmail) throws Exception {
+	@Transactional(rollbackFor = Throwable.class)
+	public Attendee getAttendeeBySessionIdUserId(String pSessionId,
+			String pUserId) throws Exception {
 		
 		// Create query to find info
-		String lBasedQuery = "SELECT attendee_object FROM attendee attendee_object WHERE attendee_object.session_id LIKE :pSessionId AND attendee_object.attendee_email LIKE :pAttendeeEmail";
+		String lBasedQuery = "SELECT attendee_object FROM Attendee attendee_object WHERE attendee_object.session.sessionId LIKE :pSessionId AND attendee_object.userId LIKE :pAttendeeEmail";
 		
 		Query lQuery = mEntityManager.createQuery(lBasedQuery);
 		lQuery = lQuery.setParameter("pSessionId", pSessionId);
 		lQuery = lQuery.setParameter("pAttendeeEmail", pSessionId);
 		
-		Object lObject = lQuery.getResultList().get(0);
+		List<?> lQueryList = lQuery.getResultList();
 		
+		// Create new list to store account
+		List<Attendee> lList = new ArrayList<Attendee>(0);
+
 		// Check items in list and cast to account only if it is an instance
 		// of
 		// account object
 		// Throw exception if there is an cast error
-		if (lObject instanceof Attendee) {
-			return ((Attendee) lObject);
-		} // if
-		else {
+		for (Object lObject : lQueryList) {
+			if (lObject instanceof Attendee) {
+				lList.add((Attendee) lObject);
+			} // if
+			else {
 				throw new ClassCastException();
-		} // else
+			} // else
+		} // for
+
+		if(lList.size() > 0)
+		{
+			return lList.get(0);
+		}  // if
+		
+		return null;
 	}  // Attendee getAttendeeBySessionIdAttendeeEmail
 
-	public void deleteAttendeeBySessionIdAttendeeEmail(String pSessionId,
-			String pAttendeeEmail) throws Exception {
-		mEntityManager.remove(getAttendeeBySessionIdAttendeeEmail(pSessionId,pAttendeeEmail));
-	}  // void deleteAttendeeBySessionIdAttendeeEmail
+	@Transactional(rollbackFor = Throwable.class)
+	public void deleteAttendeeByAttendeeId(String pAttendeeId) throws Exception {
+		mEntityManager.remove(getAttendeeByKeyValue("attendeeId", pAttendeeId));
+	}  // void deleteAttendeeBySessionIdUserId
 }  // SpringAttendeeDao

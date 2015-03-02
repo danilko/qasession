@@ -5,13 +5,25 @@ import java.util.Calendar;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 
 @Entity
 @Table(name="ANSWER")
+@JsonIdentityInfo(generator=com.fasterxml.jackson.annotation.ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Answer implements Serializable
 {
 
@@ -20,9 +32,12 @@ public class Answer implements Serializable
 	 */
 	private static final long serialVersionUID = -2033509333352468767L;
 	
-	@Column(name = "QUESTION_ID", unique = true, nullable = false) 
-	private String questionId;
+	@JsonBackReference(value="question-answer")
+	@JoinColumn(name="QUESTION_ID")
+	@OneToOne(fetch = FetchType.EAGER)
+	private Question question;
 	
+	@Id
 	@Column(name = "ANSWER_ID", unique = true, nullable = false) 
 	private String answerId;
 	
@@ -36,15 +51,15 @@ public class Answer implements Serializable
 	@Temporal(TemporalType.DATE) 
 	private Calendar updateDate;
 	
-	public String getQuestionId() {
-		return questionId;
+    public Question getQuestion() {
+		return question;
 	}
 
-	public void setQuestionId(String questionId) {
-		this.questionId = questionId;
+	public void setQuestion(Question question) {
+		this.question = question;
 	}
-	
-    public String getAnswerId() {
+
+	public String getAnswerId() {
 		return answerId;
 	}  // String getAnswerId
 

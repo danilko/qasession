@@ -1,6 +1,7 @@
 package com.qasession.controller.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -9,15 +10,22 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name="SESSION")
+@JsonIdentityInfo(generator=com.fasterxml.jackson.annotation.ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Session implements Serializable
 {
     /**
@@ -35,11 +43,15 @@ public class Session implements Serializable
 	@Column(name = "SESSION_DESCRIPTION") 
 	private String sessionDescription;
 	
-	@OneToMany(mappedBy="SESSION", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private List <Question> questions;
+	@JsonManagedReference(value="session-question")
+	@JoinColumn(name="SESSION_ID")
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private List <Question> questions = new ArrayList<Question>(0);
 	
-	@OneToMany(mappedBy="SESSION", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private List <Attendee> attendees;
+	@JsonManagedReference(value="session-attendee")
+	@JoinColumn(name="SESSION_ID")
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private List <Attendee> attendees = new ArrayList<Attendee>(0);;
 	
 	@Column(name = "SESSION_MAX_QUESTION") 
 	private Integer sessionMaxQuestion;
@@ -97,7 +109,6 @@ public class Session implements Serializable
 		sessionTopic = pSessionDescription;
 	}  // void getSessionDescription
 	
-	@JsonManagedReference
 	public List <Question> getQuestions()
 	{
 		return questions;
@@ -107,23 +118,15 @@ public class Session implements Serializable
 		this.questions = questions;
 	}
 	
-	@JsonManagedReference
-	public void setSessionHost(List <Question> pQuestions)
-	{
-		questions = pQuestions;
-	}  // void setSessionHost(List <Question> pQuestions)
-	
-	@JsonManagedReference
 	public List <Attendee> getAttendees()
 	{
 		return attendees;
 	}  // List <Attendee> getAttendees
 	
-	@JsonManagedReference
 	public void setAttendees(List <Attendee> pASttendees)
 	{
 		attendees = pASttendees;
-	}  // void setSessionHost(List <Question> pQuestions)
+	}  // void setAttendees(List <Attendee> pASttendees)
 	
 	public Integer getSessionMaxQuestion() {
 		return sessionMaxQuestion;

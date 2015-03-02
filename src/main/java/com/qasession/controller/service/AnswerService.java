@@ -12,6 +12,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import com.qasession.controller.dao.AnswerDao;
+import com.qasession.controller.dao.QuestionDao;
 import com.qasession.controller.model.Answer;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponses;
@@ -22,6 +23,8 @@ import com.wordnik.swagger.annotations.ApiResponse;
 public class AnswerService {
 	@Resource(shareable=true, name="getAnswerDao")
 	private AnswerDao mAnswerDao;
+	@Resource(shareable=true, name="getQuestionDao")
+	private QuestionDao mQuestionDao;
 	
 	@GET
 	@Path("/")
@@ -70,7 +73,7 @@ public class AnswerService {
 			Answer pAnswer) {
 		try {
 			pAnswer.setAnswerId(pAnswerId);
-			pAnswer.setQuestionId(pQuestionId);
+			pAnswer.setQuestion(mQuestionDao.getQuestionById(pQuestionId));
 			mAnswerDao.updateAnswerById(pAnswer);
 			return Response
 					.ok()
@@ -91,7 +94,7 @@ public class AnswerService {
 			@PathParam("questionId") String pQuestionId,
 			Answer pAnswer)  {
 		try {
-			pAnswer.setQuestionId(pQuestionId);
+			pAnswer.setQuestion(mQuestionDao.getQuestionById(pQuestionId));
 			return Response
 					.ok()
 					.entity(mAnswerDao.createAnswer(pAnswer)).build();

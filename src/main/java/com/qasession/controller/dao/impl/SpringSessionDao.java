@@ -9,6 +9,8 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.qasession.controller.dao.SessionDao;
 import com.qasession.controller.model.Session;
@@ -17,12 +19,13 @@ import com.qasession.controller.utility.RandomStringGenerator;
 @Repository
 public class SpringSessionDao implements SessionDao
 {
-	@PersistenceContext
+	@PersistenceContext(unitName = "getEntityManagerFactoryBean")
 	private EntityManager mEntityManager;
 	
+	@Transactional(rollbackFor = Throwable.class)
 	public List<Session> getSessionsByKeyValue(String pKeyName, String pKeyValue) {
 		// Create query to find info
-		String lBasedQuery = "SELECT session_object FROM session session_object WHERE session_object." + pKeyName.toLowerCase() + " LIKE :pKeyValue";
+		String lBasedQuery = "SELECT session_object FROM Session session_object WHERE session_object." + pKeyName + " LIKE :pKeyValue";
 		
 		Query lQuery = mEntityManager.createQuery(lBasedQuery);
 		lQuery = lQuery.setParameter("pKeyValue", pKeyValue);
@@ -48,27 +51,19 @@ public class SpringSessionDao implements SessionDao
 		return lLists;
 	}
 
+	@Transactional(rollbackFor = Throwable.class)
 	public Session getSessionById(String pSessionId) {
-		// Create query to find info
-		String lBasedQuery = "SELECT session_object FROM answer session_object WHERE session_object.session_id LIKE :pSessionId";
+		List<Session> lList = getSessionsByKeyValue("sessionId", pSessionId);
 		
-		Query lQuery = mEntityManager.createQuery(lBasedQuery);
-		lQuery = lQuery.setParameter("pSessionId", pSessionId);
-
-		Object lObject = lQuery.getResultList().get(0);
+		if(lList.size() > 0)
+		{
+			return lList.get(0);
+		}  // if
 		
-		// Check items in list and cast to account only if it is an instance
-		// of
-		// account object
-		// Throw exception if there is an cast error
-		if (lObject instanceof Session) {
-			return ((Session) lObject);
-		} // if
-		else {
-				throw new ClassCastException();
-		} // else
+		return null;
 	}  // Session getSessionsById
 
+	@Transactional(readOnly = false, rollbackFor = Throwable.class, propagation = Propagation.REQUIRED)
 	public Session createSession(Session pSession) 
 	{
 		Session newSession = new Session();
@@ -82,16 +77,18 @@ public class SpringSessionDao implements SessionDao
 		newSession.setUpdateDate(Calendar.getInstance());
 		
 		newSession.setSessionMaxQuestion(pSession.getSessionMaxQuestion());
+	
+		mEntityManager.createNativeQuery("INSERT INTO SESSION (SESSION_ID,SESSION_TOPIC,SESSION_DESCRIPTION,SESSION_STATUS,SESSION_MAX_QUESTION) VALUES ('" + pSession.getSessionId() + "','" + pSession.getSessionTopic() + "','" + pSession.getSessionDescription() + "','" + pSession.getSessionStatus() + "', " + pSession.getSessionMaxQuestion() +")").executeUpdate();;
 		
-		mEntityManager.persist(newSession);
-		
-		return pSession;
+		return newSession;
 	}  // createSession
 
+	@Transactional(readOnly = false, rollbackFor = Throwable.class)
 	public void deleteSessionById(String pSessionId) {
 		mEntityManager.remove(getSessionById(pSessionId));
 	}  // deleteSessionById
 
+	@Transactional(readOnly = false, rollbackFor = Throwable.class)
 	public Session updateSession(Session pSession) 
 	{
 		Session oldSession = getSessionById(pSession.getSessionId());
@@ -105,7 +102,7 @@ public class SpringSessionDao implements SessionDao
 		oldSession.setSessionStatus(pSession.getSessionStatus());
 		oldSession.setSessionMaxQuestion(pSession.getSessionMaxQuestion());
 		
-		mEntityManager.persist(oldSession);
+		mEntityManager.createNativeQuery("UPDATE SESSION SET SESSION_TOPIC = '" + pSession.getSessionTopic() + "', SESSION_TOPIC'" + pSession.getSessionDescription() + "', SESSION_STATUS = '" + pSession.getSessionStatus() + "', SESSION_MAX_QUESTION = " + pSession.getSessionMaxQuestion() +" WHERE SESSION_ID = '" + pSession.getSessionId() + "')").executeUpdate();;
 		
 		return oldSession;
 	}  // Session updateSession

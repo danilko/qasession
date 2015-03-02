@@ -12,6 +12,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import com.qasession.controller.dao.QuestionDao;
+import com.qasession.controller.dao.SessionDao;
 import com.qasession.controller.model.Question;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponses;
@@ -22,7 +23,8 @@ import com.wordnik.swagger.annotations.ApiResponse;
 public class QuestionService {
 	@Resource(shareable=true, name="getQuestionDao")
 	private QuestionDao mQuestionDao;
-
+	@Resource(shareable=true, name="getSessionDao")
+	private SessionDao mSessionDao;
 	@GET
 	@Path("/")
 	@ApiOperation(value = "Find question by question ID", notes = "Returns all question record that this session belong")
@@ -71,7 +73,7 @@ public class QuestionService {
 			@PathParam("sessionId") String pSessionId,
 			@PathParam("questionId") String pQuestionId, Question pQuestion) {
 		try {
-			pQuestion.setSessionId(pSessionId);
+			pQuestion.setSession(mSessionDao.getSessionById(pSessionId));
 			return Response
 					.ok()
 					.entity(mQuestionDao.createQuestion(pQuestion)).build();
@@ -92,7 +94,7 @@ public class QuestionService {
 			@PathParam("sessionId") String pSessionId,
 		    Question pQuestion) {
 		try {
-			pQuestion.setSessionId(pSessionId);
+			pQuestion.setSession(mSessionDao.getSessionById(pSessionId));
 			return Response
 					.ok()
 					.entity(mQuestionDao.createQuestion(pQuestion)).build();

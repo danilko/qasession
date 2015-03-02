@@ -31,11 +31,22 @@ public class SessionService {
 			@ApiResponse(code = 403, message = "Not authorized") })
 	public Response getSessionById(@PathParam("sessionId") String pSessionId) {
 		try {
+			Session lSession = mSessionDao.getSessionById(pSessionId);
+			
+			if (lSession != null)
+			{
 			return Response
 					.ok()
-					.entity(mSessionDao.getSessionById(pSessionId)).build();
+					.entity(lSession).build();
+			}
+			else
+			{
+				return Response.status(404).build();
+			}
+			
 		} // try
 		catch (Exception pExeception) {
+			System.out.println(pExeception);
 			return Response.serverError().build();
 		} // catch
 	} // Session getSessionById
@@ -47,12 +58,18 @@ public class SessionService {
 	@ApiResponses(value = { @ApiResponse(code = 403, message = "Not authorized") })
 	public Response createSession(Session pSession) {
 		try {
+
+			System.out.println("Create SEssion");
+
 			return Response
 					.ok()
 					.entity(mSessionDao.createSession(pSession)).build();
+			
 		} // try
 		catch (Exception pExeception) {
-			return Response.serverError().build();
+			System.out.println("Create SEssion Error");
+			System.out.println(pExeception);
+			return Response.serverError().entity(pExeception).build();
 		} // catch
 	} // Session createSession
 

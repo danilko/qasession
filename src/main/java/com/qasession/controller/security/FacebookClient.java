@@ -26,6 +26,19 @@ public class FacebookClient {
 		return "qa_session_user_info";
 	}
 	
+	public static String getFacebookSessionCodeId(String pFacebookAppID) {
+		return "fb_" + pFacebookAppID + "_code";
+	}
+	
+	public static String getFacebookSessionAccessTokenId(String pFacebookAppID) {
+		return "fb_" + pFacebookAppID + "_access_token";
+	}
+	
+	public static String getFacebookSessioUserId(String pFacebookAppID) {
+		return "fb_" + pFacebookAppID + "_user_id";
+	}
+	
+	
 	public static String getLogInRedirectionURI() {
 		return OAUTH_AUTH_URI + "/oauth/authorize?client_id=" + OAUTH_API_CLIENT_ID
 				+ "&display=page&redirect_uri=" + OAUTH_REDUCT_URI + "/OAuthConsumerCode&scope="

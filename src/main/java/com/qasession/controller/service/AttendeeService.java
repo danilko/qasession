@@ -12,6 +12,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import com.qasession.controller.dao.AttendeeDao;
+import com.qasession.controller.dao.SessionDao;
 import com.qasession.controller.model.Attendee;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponses;
@@ -23,16 +24,19 @@ public class AttendeeService {
 	@Resource(shareable=true, name="getAttendeeDao")
 	private AttendeeDao mAttendeeDao;
 	
+	@Resource(shareable=true, name="getSessionDao")
+	private SessionDao mSessionDao;
+	
 	@GET
-	@Path("/attendee/{attendeeEmail}")
+	@Path("/attendee/{attendeeId}")
 	@ApiOperation(value = "Find attendee by attendee email", notes = "Returns all attendee record that this session belong")
 	@ApiResponses(value = { @ApiResponse(code = 404, message = "Attendee ID not found"), @ApiResponse(code = 403, message = "Not authorized") })
 	public Response getAllAttendeeOccurance(
-			@PathParam("attendeeEmail") String pAttendeeEmail) {
+			@PathParam("attendeeId") String pAttendeeId) {
 		try {
 			return Response
 					.ok()
-					.entity(mAttendeeDao.getAttendeeByKeyValue("attendee_email", pAttendeeEmail)).build();
+					.entity(mAttendeeDao.getAttendeeByKeyValue("attendeeId", pAttendeeId)).build();
 		} // try
 		catch (Exception pExeception) {
 			return Response.serverError().build();
@@ -40,16 +44,16 @@ public class AttendeeService {
 	} // Session getAllAttendeeOccurance
 
 	@GET
-	@Path("/session/{sessionId}/attendee/{attendeeEmail}")
+	@Path("/session/{sessionId}/attendee/{userId}")
 	@ApiOperation(value = "Find attendee by attendee ID within a session ID", notes = "")
 	@ApiResponses(value = { @ApiResponse(code = 404, message = "Attendee ID not found"), @ApiResponse(code = 403, message = "Not authorized") })
 	public Response getSessionAttendee(
 			@PathParam("sessionId") String pSessionId,
-			@PathParam("attendeeEmail") String pAttendeeEmail) {
+			@PathParam("userId") String pUserId) {
 		try {
 			return Response
 					.ok()
-					.entity(mAttendeeDao.getAttendeeBySessionIdAttendeeEmail(pSessionId, pAttendeeEmail)).build();
+					.entity(mAttendeeDao.getAttendeeBySessionIdUserId(pSessionId, pUserId)).build();
 		} // try
 		catch (Exception pExeception) {
 			return Response.serverError().build();
@@ -65,7 +69,7 @@ public class AttendeeService {
 			@PathParam("sessionId") String pSessionId,
 			Attendee pAttendee) {
 		try {
-			pAttendee.setSessionId(pSessionId);
+			pAttendee.setSession(mSessionDao.getSessionById(pSessionId));
 			
 			return Response
 					.ok()
@@ -85,7 +89,7 @@ public class AttendeeService {
 			@PathParam("sessionId") String pSessionId,
 			Attendee pAttendee) {
 		try {
-			pAttendee.setSessionId(pSessionId);
+			pAttendee.setSession(mSessionDao.getSessionById(pSessionId));
 			
 			return Response
 					.ok()
@@ -97,14 +101,14 @@ public class AttendeeService {
 	} // Session createSessionAttendee
 
 	@DELETE
-	@Path("/session/{sessionId}/attendee/{attendeeEmail}")
+	@Path("/attendee/{attendeeId}")
 	@ApiOperation(value = "Delete an attendee by attendee ID within a session ID", notes = "")
 	@ApiResponses(value = { @ApiResponse(code = 404, message = "Attendee ID not found"), @ApiResponse(code = 403, message = "Not authorized") })
 	public Response deleteSessionAttendee(
-			@PathParam("sessionId") String pSessionId,
-			@PathParam("attendeeEmail") String pAttendeeEmail) {
+			@PathParam("attendeeId") String pAttendeeId) {
 		try {
-			mAttendeeDao.deleteAttendeeBySessionIdAttendeeEmail(pSessionId, pAttendeeEmail);
+			mAttendeeDao.deleteAttendeeByAttendeeId(pAttendeeId);
+			
 			return Response
 					.ok()
 					.entity("{\"status\":\"success\"}").build();

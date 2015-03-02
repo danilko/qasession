@@ -40,14 +40,14 @@ public class SecurityFilter implements Filter {
 		String lOAuthConsumerCodePath = lRequest.getRequestURI();
 		if(StringUtils.isNotBlank(lOAuthConsumerCodePath))
 		{
-			lOAuthConsumerCode = lOAuthConsumerCodePath.contains("/OAuthConsumerCode");
+			lOAuthConsumerCode = lOAuthConsumerCodePath.contains("/controller/OAuthConsumerCode");
 		} // if
-		
-		System.out.println("PATH INFO " + lOAuthConsumerCodePath);
 		
 		// Case 1 - OAuthConsumerCode endpoint with auth code
 		if(lOAuthConsumerCode)
 		{
+			System.out.println("Get from OAuthConsumerCode: " + lOAuthConsumerCode);
+			
 			String lAuthCode = lRequest.getParameter("code");
 			
 			if(StringUtils.isNotBlank(lAuthCode))
@@ -87,8 +87,8 @@ public class SecurityFilter implements Filter {
 
 		if(!lAuthorize && StringUtils.isNotBlank(lTokenHeader))
 		{
-			System.out.println(lTokenHeader);
-
+			System.out.println("Get from Header: " + lTokenHeader);
+			
 			try
 			{
 				String lAccessToken = lTokenHeader.replace("Bearer ", "");
@@ -117,8 +117,7 @@ public class SecurityFilter implements Filter {
 		
 		if(!lAuthorize && lUserInfo != null)
 		{
-			System.out.println(lUserInfo.getAccessToken());
-			System.out.println(lUserInfo.getExpiresIn());
+			System.out.println("Get from Session: " + lUserInfo.getAccessToken());
 			
 			try
 			{
