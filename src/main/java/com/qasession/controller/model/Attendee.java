@@ -31,16 +31,15 @@ public class Attendee implements Serializable
 	@Column(name = "ATTENDEE_ID") 
 	private String attendeeId;
 
-
 	@JoinColumn(name="SESSION_ID")
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JsonBackReference(value="session-attendee")
 	private Session session;
 	
-	@Column(name = "USER_ID") 
-	private String userId;
+	@JoinColumn(name = "USER_ID")
+	@ManyToOne(fetch = FetchType.EAGER)
+	private UserTranslate userTranslate;
 	
-	@Column(name = "SESSION_ROLE") 
+	@Column(name = "SESSION_ROLE", nullable = false)  
 	private String sessionRole;
 	
 	@Column(name = "UPDATE_DATE", nullable = false) 
@@ -72,13 +71,13 @@ public class Attendee implements Serializable
 		this.updateDate = updateDate;
 	}
 
-	public String getUserId() {
-		return userId;
-	}  // String getUserId
+	public UserTranslate getUserTranslate() {
+		return userTranslate;
+	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}  // void setUserId
+	public void setUserTranslate(UserTranslate userTranslate) {
+		this.userTranslate = userTranslate;
+	}
 
 	public String getSessionRole() {
 		return sessionRole;

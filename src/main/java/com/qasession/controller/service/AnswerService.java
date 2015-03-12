@@ -11,6 +11,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.qasession.controller.dao.AnswerDao;
 import com.qasession.controller.dao.QuestionDao;
 import com.qasession.controller.model.Answer;
@@ -21,6 +24,8 @@ import com.wordnik.swagger.annotations.ApiResponse;
 @Produces("application/json")
 @Path("/session/{sessionId}/question/{questionId}/answer")
 public class AnswerService {
+	private static Logger LOGGER = LoggerFactory.getLogger(AnswerService.class);
+	
 	@Resource(shareable=true, name="getAnswerDao")
 	private AnswerDao mAnswerDao;
 	@Resource(shareable=true, name="getQuestionDao")
@@ -39,6 +44,7 @@ public class AnswerService {
 					.entity(mAnswerDao.getAnswerByKeyValue("quesion_id", pQuestionId)).build();
 		} // try
 		catch (Exception pExeception) {
+			LOGGER.error(pExeception.toString());
 			return Response.serverError().build();
 		} // catch
 	} // Session getAllAttendeeOccurance
@@ -57,6 +63,7 @@ public class AnswerService {
 					.entity(mAnswerDao.getAnswerById(pAnswerId)).build();
 		} // try
 		catch (Exception pExeception) {
+			LOGGER.error(pExeception.toString());
 			return Response.serverError().build();
 		} // catch
 	} // Response getAnswer
@@ -80,6 +87,7 @@ public class AnswerService {
 					.entity(mAnswerDao.createAnswer(pAnswer)).build();
 		} // try
 		catch (Exception pExeception) {
+			LOGGER.error(pExeception.toString());
 			return Response.serverError().build();
 		} // catch
 	} // Response updateAnswer
@@ -100,6 +108,7 @@ public class AnswerService {
 					.entity(mAnswerDao.createAnswer(pAnswer)).build();
 		} // try
 		catch (Exception pExeception) {
+			LOGGER.error(pExeception.toString());
 			return Response.serverError().build();
 		} // catch
 	} // Response createAnswer
@@ -119,6 +128,7 @@ public class AnswerService {
 					.entity("{\"status\":\"success\"}").build();
 		} // try
 		catch (Exception pExeception) {
+			LOGGER.error(pExeception.toString());
 			return Response.serverError().build();
 		} // catch
 	} // Response deleteAnswer

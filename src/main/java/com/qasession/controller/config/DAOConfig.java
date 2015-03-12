@@ -5,7 +5,6 @@ import javax.sql.DataSource;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableLoadTimeWeaving;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
@@ -22,10 +21,12 @@ import com.qasession.controller.dao.AnswerDao;
 import com.qasession.controller.dao.AttendeeDao;
 import com.qasession.controller.dao.QuestionDao;
 import com.qasession.controller.dao.SessionDao;
+import com.qasession.controller.dao.UserTranslateDao;
 import com.qasession.controller.dao.impl.SpringAnswerDao;
 import com.qasession.controller.dao.impl.SpringAttendeeDao;
 import com.qasession.controller.dao.impl.SpringQuestionDao;
 import com.qasession.controller.dao.impl.SpringSessionDao;
+import com.qasession.controller.dao.impl.SpringUserTranslateDao;
 
 @Configuration
 @EnableTransactionManagement
@@ -61,10 +62,16 @@ public class DAOConfig
 	
 	
 	@Bean
-	public AnswerDao getSpringAnswerDAO()
+	public AnswerDao getSpringAnswerDao()
 	{
 		return new SpringAnswerDao();
 	}  // Account getUser
+	
+	@Bean
+	public UserTranslateDao getUserTranslateDao()
+	{
+		return new SpringUserTranslateDao();
+	}  // UserTranslate getUserTranslateDao
 	
 	@Bean
 	public JpaVendorAdapter getJpaVendorAdapter()

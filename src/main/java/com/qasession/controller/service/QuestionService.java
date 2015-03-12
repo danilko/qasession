@@ -11,6 +11,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.qasession.controller.dao.QuestionDao;
 import com.qasession.controller.dao.SessionDao;
 import com.qasession.controller.model.Question;
@@ -21,6 +24,8 @@ import com.wordnik.swagger.annotations.ApiResponse;
 @Produces("application/json")
 @Path("/session/{sessionId}/question")
 public class QuestionService {
+	private static Logger LOGGER = LoggerFactory.getLogger(QuestionService.class);
+	
 	@Resource(shareable=true, name="getQuestionDao")
 	private QuestionDao mQuestionDao;
 	@Resource(shareable=true, name="getSessionDao")
@@ -40,6 +45,7 @@ public class QuestionService {
 							pSessionId)).build();
 		} // try
 		catch (Exception pExeception) {
+			LOGGER.error(pExeception.toString());
 			return Response.serverError().build();
 		} // catch
 	} // Session getAllAttendeeOccurance
@@ -79,6 +85,8 @@ public class QuestionService {
 					.entity(mQuestionDao.createQuestion(pQuestion)).build();
 		} // try
 		catch (Exception pExeception) {
+
+			LOGGER.error(pExeception.toString());
 			return Response.serverError().build();
 		} // catch
 	} // Session updateSessionAttendee
@@ -120,6 +128,8 @@ public class QuestionService {
 					.entity("{\"status\":\"success\"}").build();
 		} // try
 		catch (Exception pExeception) {
+
+			LOGGER.error(pExeception.toString());
 			return Response.serverError().build();
 		} // catch
 	} // Session deleteSessionAttendee

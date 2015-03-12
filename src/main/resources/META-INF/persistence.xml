@@ -9,6 +9,7 @@
         <class>com.qasession.controller.model.Attendee</class>
         <class>com.qasession.controller.model.Session</class>
         <class>com.qasession.controller.model.Question</class>
+        <class>com.qasession.controller.model.UserTranslate</class>
         <properties>
             <property name="openjpa.Log" value="Runtime=TRACE,SQL=TRACE" />
             <property name="openjpa.jdbc.DBDictionary"

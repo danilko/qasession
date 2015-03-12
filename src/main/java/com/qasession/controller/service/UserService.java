@@ -1,5 +1,8 @@
 package com.qasession.controller.service;
 
+import java.util.List;
+
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
@@ -9,6 +12,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.qasession.controller.dao.UserTranslateDao;
+import com.qasession.controller.model.UserTranslate;
 import com.qasession.controller.security.FacebookClient;
 import com.qasession.controller.security.UserInfo;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -18,7 +26,60 @@ import com.wordnik.swagger.annotations.ApiResponses;
 @Produces("application/json")
 @Path("/user")
 public class UserService {
+	private static Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 	
+	@Resource(shareable=true, name="getUserTranslateDao")
+	private UserTranslateDao mUserTranslateDao;
+	
+	@GET
+	@ApiOperation(value = "Get current token info", notes = "Returns all attendee record that this session belong")
+	@ApiResponses(value = { @ApiResponse(code = 404, message = "Attendee ID not found"), @ApiResponse(code = 403, message = "Not authorized") })
+	public Response getUserTranslate(@Context HttpServletRequest pHttpServletRequest ) {
+		try {
+			UserInfo lUserInfo = (UserInfo)pHttpServletRequest.getSession().getAttribute(FacebookClient.getUserInfoSessionId());
+			
+			List <UserTranslate> lList = mUserTranslateDao.getUserTranslatesByKeyValue("fbUserId", lUserInfo.getFacebookProfileId());
+			
+			
+			UserTranslate lUserTranslate = null;
+			
+			if(lList.size() > 0)
+			{
+				lUserTranslate = lList.get(0);
+			}  // if
+			
+			if(lUserTranslate == null)
+			{
+				lUserTranslate = new UserTranslate();
+				lUserTranslate.setFbUserId(lUserInfo.getFacebookProfileId());
+				lUserTranslate.setFirstName(lUserInfo.getFirstName());
+				lUserTranslate.setLastName(lUserInfo.getLastName());
+				
+				lUserTranslate = mUserTranslateDao.createUserTranslate(lUserTranslate);
+			}  // if
+			else if(lUserInfo.getUserId() == null)
+			{
+				lUserTranslate.setFirstName(lUserInfo.getFirstName());
+				lUserTranslate.setLastName(lUserInfo.getLastName());
+				
+				lUserTranslate = mUserTranslateDao.updateUserTranslate(lUserTranslate);
+			}  // else if
+			
+			lUserInfo.setUserId(lUserTranslate.getUserId());
+			
+			pHttpServletRequest.getSession().setAttribute(FacebookClient.getUserInfoSessionId(), lUserInfo);
+			
+			return Response
+					.ok()
+					.entity(lUserInfo).build();
+		} // try
+		catch (Exception pExeception) {
+			LOGGER.error(pExeception.toString());
+			return Response.serverError().build();
+		} // catch
+	} // Session getAllAttendeeOccurance
+	
+	@Path("/token")
 	@GET
 	@ApiOperation(value = "Get current token info", notes = "Returns all attendee record that this session belong")
 	@ApiResponses(value = { @ApiResponse(code = 404, message = "Attendee ID not found"), @ApiResponse(code = 403, message = "Not authorized") })
@@ -29,6 +90,7 @@ public class UserService {
 					.entity(pHttpServletRequest.getSession().getAttribute(FacebookClient.getUserInfoSessionId())).build();
 		} // try
 		catch (Exception pExeception) {
+			LOGGER.error(pExeception.toString());
 			return Response.serverError().build();
 		} // catch
 	} // Session getAllAttendeeOccurance
@@ -51,7 +113,8 @@ public class UserService {
 			return Response.ok().build();
 		} // try
 		catch (Exception pExeception) {
+			LOGGER.error(pExeception.toString());
 			return Response.serverError().build();
 		} // catch
 	} // Session getAllAttendeeOccurance
-}
+}  // class UserTranslateService

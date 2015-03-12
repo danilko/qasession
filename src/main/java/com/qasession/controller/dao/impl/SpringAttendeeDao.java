@@ -6,6 +6,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TemporalType;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,21 +56,21 @@ public class SpringAttendeeDao implements AttendeeDao
 	{
 		pAttendee.setAttendeeId(RandomStringGenerator.generator(RandomStringGenerator.ID_LENTH));
 		
-		mEntityManager.persist(pAttendee);
+		mEntityManager.createNativeQuery("INSERT INTO ATTENDEE (ATTENDEE_ID,SESSION_ID,USER_ID,SESSION_ROLE,UPDATE_DATE) VALUES ('" + pAttendee.getAttendeeId() + "','" + pAttendee.getSession().getSessionId() + "','" + pAttendee.getUserTranslate().getUserId() + "','" + pAttendee.getSessionRole() + "', ?)").setParameter(1, pAttendee.getUpdateDate(), TemporalType.TIMESTAMP).executeUpdate();
 		
-		return pAttendee;
+		return getAttendeeBySessionIdUserId(pAttendee.getSession().getSessionId(), pAttendee.getUserTranslate().getUserId());
 	}  // Attendee createAttendee
 
 	@Transactional(rollbackFor = Throwable.class)
 	public Attendee updateAttende(Attendee pAttendee) throws Exception
 	{
-		Attendee oldAttendee = getAttendeeBySessionIdUserId(pAttendee.getSession().getSessionId(), pAttendee.getUserId());
+		Attendee oldAttendee = getAttendeeBySessionIdUserId(pAttendee.getSession().getSessionId(), pAttendee.getUserTranslate().getUserId());
 		
 		oldAttendee.setSessionRole(pAttendee.getSessionRole());
 		
 		mEntityManager.persist(oldAttendee);
 		
-		return oldAttendee;
+		return getAttendeeBySessionIdUserId(oldAttendee.getSession().getSessionId(), oldAttendee.getUserTranslate().getUserId());
 	}  // Attendee updateAttende
 
 	@Transactional(rollbackFor = Throwable.class)
@@ -77,11 +78,11 @@ public class SpringAttendeeDao implements AttendeeDao
 			String pUserId) throws Exception {
 		
 		// Create query to find info
-		String lBasedQuery = "SELECT attendee_object FROM Attendee attendee_object WHERE attendee_object.session.sessionId LIKE :pSessionId AND attendee_object.userId LIKE :pAttendeeEmail";
+		String lBasedQuery = "SELECT attendee_object FROM Attendee attendee_object WHERE attendee_object.session.sessionId LIKE :pSessionId AND attendee_object.userTranslate.userId LIKE :pUserId";
 		
 		Query lQuery = mEntityManager.createQuery(lBasedQuery);
 		lQuery = lQuery.setParameter("pSessionId", pSessionId);
-		lQuery = lQuery.setParameter("pAttendeeEmail", pSessionId);
+		lQuery = lQuery.setParameter("pUserId", pSessionId);
 		
 		List<?> lQueryList = lQuery.getResultList();
 		

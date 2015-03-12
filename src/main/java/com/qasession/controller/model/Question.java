@@ -51,8 +51,10 @@ public class Question implements Serializable
 	@Column(name = "QUESTION_STATUS") 
 	private String questionStatus;
 	
+	@JoinColumn(name="ATTENDEE_ID")
 	@Column(name = "CREATED_BY") 
-    private String createdBy;
+	@ManyToOne(fetch=FetchType.EAGER)
+    private Attendee createdBy;
     
 	@Column(name = "UPDATE_DATE", nullable = false)  
 	@Temporal(TemporalType.DATE) 
@@ -106,11 +108,12 @@ public class Question implements Serializable
 		this.questionStatus = questionStatus;
 	}  // void setQuestionStatus
 
-	public String getCreatedBy() {
+	public Attendee getCreatedBy() {
 		return createdBy;
 	}
-	
-	public void setCreatedBy(String createdBy) {
+
+	public void setCreatedBy(Attendee createdBy) {
 		this.createdBy = createdBy;
 	}
+
 }  // class Question

@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -44,9 +45,11 @@ public class Answer implements Serializable
 	@Column(name = "ANSWER_CONTENT") 
     private String content;
 	
+	@JoinColumn(name="ATTENDEE_ID")
 	@Column(name = "CREATED_BY") 
-    private String createdBy;
-    
+	@ManyToOne(fetch=FetchType.EAGER)
+    private Attendee createdBy;
+
 	@Column(name = "UPDATE_DATE", nullable = false) 
 	@Temporal(TemporalType.DATE) 
 	private Calendar updateDate;
@@ -83,12 +86,12 @@ public class Answer implements Serializable
 		this.content = content;
 	}  // void setContent
 	
-	public String getCreatedBy() {
+    
+	public Attendee getCreatedBy() {
 		return createdBy;
 	}
 
-	public void setCreatedBy(String createdBy) {
+	public void setCreatedBy(Attendee createdBy) {
 		this.createdBy = createdBy;
 	}
-
 }  // class Answer

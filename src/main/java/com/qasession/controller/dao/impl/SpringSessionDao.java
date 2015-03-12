@@ -7,6 +7,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TemporalType;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -21,6 +22,7 @@ public class SpringSessionDao implements SessionDao
 {
 	@PersistenceContext(unitName = "getEntityManagerFactoryBean")
 	private EntityManager mEntityManager;
+	
 	
 	@Transactional(rollbackFor = Throwable.class)
 	public List<Session> getSessionsByKeyValue(String pKeyName, String pKeyValue) {
@@ -64,7 +66,7 @@ public class SpringSessionDao implements SessionDao
 	}  // Session getSessionsById
 
 	@Transactional(readOnly = false, rollbackFor = Throwable.class, propagation = Propagation.REQUIRED)
-	public Session createSession(Session pSession) 
+	public Session createSession(Session pSession, String pUserId) throws Exception 
 	{
 		Session newSession = new Session();
 
@@ -76,15 +78,18 @@ public class SpringSessionDao implements SessionDao
 		newSession.setSessionDescription(pSession.getSessionDescription());
 		newSession.setUpdateDate(Calendar.getInstance());
 		
+		newSession.setSessionStatus(pSession.getSessionStatus());
+		
 		newSession.setSessionMaxQuestion(pSession.getSessionMaxQuestion());
 	
-		mEntityManager.createNativeQuery("INSERT INTO SESSION (SESSION_ID,SESSION_TOPIC,SESSION_DESCRIPTION,SESSION_STATUS,SESSION_MAX_QUESTION) VALUES ('" + pSession.getSessionId() + "','" + pSession.getSessionTopic() + "','" + pSession.getSessionDescription() + "','" + pSession.getSessionStatus() + "', " + pSession.getSessionMaxQuestion() +")").executeUpdate();;
-		
-		return newSession;
+		mEntityManager.createNativeQuery("INSERT INTO SESSION (SESSION_ID,SESSION_TOPIC,SESSION_DESCRIPTION,SESSION_STATUS,SESSION_MAX_QUESTION, UPDATE_DATE) VALUES ('" + newSession.getSessionId() + "','" + newSession.getSessionTopic() + "','" + newSession.getSessionDescription() + "','" + newSession.getSessionStatus() + "', " + newSession.getSessionMaxQuestion() + ", ?)").setParameter(1, newSession.getUpdateDate(), TemporalType.TIMESTAMP).executeUpdate();
+	
+		return getSessionById(newSession.getSessionId());
 	}  // createSession
 
 	@Transactional(readOnly = false, rollbackFor = Throwable.class)
-	public void deleteSessionById(String pSessionId) {
+	public void deleteSessionById(String pSessionId) throws Exception {
+
 		mEntityManager.remove(getSessionById(pSessionId));
 	}  // deleteSessionById
 
@@ -101,10 +106,9 @@ public class SpringSessionDao implements SessionDao
 		
 		oldSession.setSessionStatus(pSession.getSessionStatus());
 		oldSession.setSessionMaxQuestion(pSession.getSessionMaxQuestion());
+		mEntityManager.createNativeQuery("UPDATE SESSION SET SESSION_TOPIC = '" + pSession.getSessionTopic() + "', SESSION_TOPIC'" + pSession.getSessionDescription() + "', SESSION_STATUS = '" + pSession.getSessionStatus() + "', SESSION_MAX_QUESTION = " + pSession.getSessionMaxQuestion() +" WHERE SESSION_ID = '" + pSession.getSessionId() + "'").executeUpdate();
 		
-		mEntityManager.createNativeQuery("UPDATE SESSION SET SESSION_TOPIC = '" + pSession.getSessionTopic() + "', SESSION_TOPIC'" + pSession.getSessionDescription() + "', SESSION_STATUS = '" + pSession.getSessionStatus() + "', SESSION_MAX_QUESTION = " + pSession.getSessionMaxQuestion() +" WHERE SESSION_ID = '" + pSession.getSessionId() + "')").executeUpdate();;
-		
-		return oldSession;
+		return getSessionById(oldSession.getSessionId());
 	}  // Session updateSession
 
 }  // class SpringSessionDao

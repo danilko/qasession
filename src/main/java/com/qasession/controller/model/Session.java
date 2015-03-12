@@ -48,7 +48,6 @@ public class Session implements Serializable
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List <Question> questions = new ArrayList<Question>(0);
 	
-	@JsonManagedReference(value="session-attendee")
 	@JoinColumn(name="SESSION_ID")
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List <Attendee> attendees = new ArrayList<Attendee>(0);;
@@ -106,7 +105,7 @@ public class Session implements Serializable
 	
 	public void setSessionDescription(String pSessionDescription)
 	{
-		sessionTopic = pSessionDescription;
+		sessionDescription = pSessionDescription;
 	}  // void getSessionDescription
 	
 	public List <Question> getQuestions()

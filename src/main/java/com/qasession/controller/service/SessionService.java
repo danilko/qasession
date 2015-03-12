@@ -1,6 +1,9 @@
 package com.qasession.controller.service;
 
+import java.util.Calendar;
+
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -9,10 +12,19 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.qasession.controller.dao.AttendeeDao;
 import com.qasession.controller.dao.SessionDao;
+import com.qasession.controller.dao.UserTranslateDao;
+import com.qasession.controller.model.Attendee;
 import com.qasession.controller.model.Session;
+import com.qasession.controller.security.FacebookClient;
+import com.qasession.controller.security.UserInfo;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
@@ -20,9 +32,17 @@ import com.wordnik.swagger.annotations.ApiResponses;
 @Produces("application/json")
 @Path("/session")
 public class SessionService {
+	private static Logger LOGGER = LoggerFactory.getLogger(SessionService.class);
+	
 	@Resource(shareable=true, name="getSessionDao")
 	private SessionDao mSessionDao;
 
+	@Resource(shareable=true, name="getUserTranslateDao")
+	private UserTranslateDao mUserTranslateDao;
+	
+	@Resource(shareable=true, name="getAttendeeDao")
+	private AttendeeDao mAttendeeDao;
+	
 	@GET
 	@Path("/{sessionId}")
 	@ApiOperation(value = "Find session by session ID", notes = "Return the session record that this session belong")
@@ -46,7 +66,7 @@ public class SessionService {
 			
 		} // try
 		catch (Exception pExeception) {
-			System.out.println(pExeception);
+			LOGGER.error(pExeception.toString());
 			return Response.serverError().build();
 		} // catch
 	} // Session getSessionById
@@ -56,19 +76,27 @@ public class SessionService {
 	@Path("/")
 	@ApiOperation(value = "Create a session", notes = "Create a session")
 	@ApiResponses(value = { @ApiResponse(code = 403, message = "Not authorized") })
-	public Response createSession(Session pSession) {
+	public Response createSession(Session pSession, @Context HttpServletRequest pHttpServletRequest) {
 		try {
-
-			System.out.println("Create SEssion");
-
+			UserInfo lUserInfo = (UserInfo)pHttpServletRequest.getSession().getAttribute(FacebookClient.getUserInfoSessionId());
+			
+			Session newSession = mSessionDao.createSession(pSession, lUserInfo.getUserId());
+			
+			Attendee lAttendee = new Attendee();
+			lAttendee.setSession(newSession);
+			lAttendee.setUpdateDate(Calendar.getInstance());
+			lAttendee.setSessionRole("HOST");
+			lAttendee.setUserTranslate(mUserTranslateDao.getUserTranslateById(lUserInfo.getUserId()));
+			
+			mAttendeeDao.createAttendee(lAttendee);
+			
 			return Response
 					.ok()
-					.entity(mSessionDao.createSession(pSession)).build();
+					.entity(mSessionDao.getSessionById(newSession.getSessionId())).build();
 			
 		} // try
 		catch (Exception pExeception) {
-			System.out.println("Create SEssion Error");
-			System.out.println(pExeception);
+			LOGGER.error(pExeception.toString());
 			return Response.serverError().entity(pExeception).build();
 		} // catch
 	} // Session createSession
@@ -88,6 +116,7 @@ public class SessionService {
 					.entity(mSessionDao.updateSession(pSession)).build();
 		} // try
 		catch (Exception pExeception) {
+			LOGGER.error(pExeception.toString());
 			return Response.serverError().build();
 		} // catch
 	} // Session deleteSessionById
@@ -104,6 +133,7 @@ public class SessionService {
 			return Response.ok().entity("{\"status\":\"ok\"}").build();
 		} // try
 		catch (Exception pExeception) {
+			LOGGER.error(pExeception.toString());
 			return Response.serverError().build();
 		} // catch
 	} // Session updateSessionById
