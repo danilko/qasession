@@ -53,10 +53,17 @@ Please generate a new app for website at Facebook API Website:
 https://developers.facebook.com/
 
 Please download docker and other require tools
-JDK 7 or Above http://www.oracle.com/technetwork/java/javase/downloads/index.html
-Maven http://maven.apache.org/
-Docker https://www.docker.com/
-PSQL Client Tools https://wiki.postgresql.org/wiki/Community_Guide_to_PostgreSQL_GUI_Tools
+JDK 7 or Above 
+http://www.oracle.com/technetwork/java/javase/downloads/index.html
+
+Maven 
+http://maven.apache.org/
+
+Docker 
+https://www.docker.com/
+
+PSQL Client Tools 
+https://wiki.postgresql.org/wiki/Community_Guide_to_PostgreSQL_GUI_Tools
 
 ```
 export CONTAINER=$(docker run -p 127.0.0.1:5432:5432 -d stackbrew/postgres:latest)
