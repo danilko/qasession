@@ -32,17 +32,18 @@ import com.wordnik.swagger.annotations.ApiResponses;
 @Produces("application/json")
 @Path("/session")
 public class SessionService {
-	private static Logger LOGGER = LoggerFactory.getLogger(SessionService.class);
-	
-	@Resource(shareable=true, name="getSessionDao")
+	private static Logger LOGGER = LoggerFactory
+			.getLogger(SessionService.class);
+
+	@Resource(shareable = true, name = "getSessionDao")
 	private SessionDao mSessionDao;
 
-	@Resource(shareable=true, name="getUserTranslateDao")
+	@Resource(shareable = true, name = "getUserTranslateDao")
 	private UserTranslateDao mUserTranslateDao;
-	
-	@Resource(shareable=true, name="getAttendeeDao")
+
+	@Resource(shareable = true, name = "getAttendeeDao")
 	private AttendeeDao mAttendeeDao;
-	
+
 	@GET
 	@Path("/{sessionId}")
 	@ApiOperation(value = "Find session by session ID", notes = "Return the session record that this session belong")
@@ -52,18 +53,13 @@ public class SessionService {
 	public Response getSessionById(@PathParam("sessionId") String pSessionId) {
 		try {
 			Session lSession = mSessionDao.getSessionById(pSessionId);
-			
-			if (lSession != null)
-			{
-			return Response
-					.ok()
-					.entity(lSession).build();
-			}
-			else
-			{
+
+			if (lSession != null) {
+				return Response.ok().entity(lSession).build();
+			} else {
 				return Response.status(404).build();
 			}
-			
+
 		} // try
 		catch (Exception pExeception) {
 			LOGGER.error(pExeception.toString());
@@ -76,24 +72,29 @@ public class SessionService {
 	@Path("/")
 	@ApiOperation(value = "Create a session", notes = "Create a session")
 	@ApiResponses(value = { @ApiResponse(code = 403, message = "Not authorized") })
-	public Response createSession(Session pSession, @Context HttpServletRequest pHttpServletRequest) {
+	public Response createSession(Session pSession,
+			@Context HttpServletRequest pHttpServletRequest) {
 		try {
-			UserInfo lUserInfo = (UserInfo)pHttpServletRequest.getSession().getAttribute(FacebookClient.getUserInfoSessionId());
-			
-			Session newSession = mSessionDao.createSession(pSession, lUserInfo.getUserId());
-			
+			UserInfo lUserInfo = (UserInfo) pHttpServletRequest.getSession()
+					.getAttribute(FacebookClient.getUserInfoSessionId());
+
+			Session newSession = mSessionDao.createSession(pSession,
+					lUserInfo.getUserId());
+
 			Attendee lAttendee = new Attendee();
 			lAttendee.setSession(newSession);
 			lAttendee.setUpdateDate(Calendar.getInstance());
 			lAttendee.setSessionRole("HOST");
-			lAttendee.setUserTranslate(mUserTranslateDao.getUserTranslateById(lUserInfo.getUserId()));
-			
+			lAttendee.setUserTranslate(mUserTranslateDao
+					.getUserTranslateById(lUserInfo.getUserId()));
+
 			mAttendeeDao.createAttendee(lAttendee);
-			
+
 			return Response
 					.ok()
-					.entity(mSessionDao.getSessionById(newSession.getSessionId())).build();
-			
+					.entity(mSessionDao.getSessionById(newSession
+							.getSessionId())).build();
+
 		} // try
 		catch (Exception pExeception) {
 			LOGGER.error(pExeception.toString());
@@ -108,12 +109,29 @@ public class SessionService {
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "Session ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
-	public Response deleteSessionById(
-			@PathParam("sessionId") String pSessionId, Session pSession) {
+	public Response updateSessionById(
+			@PathParam("sessionId") String pSessionId, Session pSession,
+			@Context HttpServletRequest pHttpServletRequest) {
 		try {
-			return Response
-					.ok()
-					.entity(mSessionDao.updateSession(pSession)).build();
+
+			UserInfo lUserInfo = (UserInfo) pHttpServletRequest.getSession()
+					.getAttribute(FacebookClient.getUserInfoSessionId());
+			Attendee lAttendee = mAttendeeDao.getAttendeeBySessionIdUserId(
+					pSessionId, lUserInfo.getUserId());
+
+			if (!lUserInfo.getUserRole().equals("ADMIN")
+					&& (lAttendee == null || !lAttendee.getSessionRole()
+							.equals("HOST"))) {
+				return Response
+						.status(Response.Status.FORBIDDEN)
+						.entity("{\"status\":\"forbidden\", \"message\":\"user does not have the previliege to perform the particular action\"}")
+						.build();
+			} // if
+
+			pSession.setSessionId(pSessionId);
+			
+			return Response.ok().entity(mSessionDao.updateSession(pSession))
+					.build();
 		} // try
 		catch (Exception pExeception) {
 			LOGGER.error(pExeception.toString());
@@ -127,8 +145,25 @@ public class SessionService {
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "Session ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
-	public Response updateSessionById(@PathParam("sessionId") String pSessionId) {
+	public Response deleteSessionById(
+			@PathParam("sessionId") String pSessionId,
+			@Context HttpServletRequest pHttpServletRequest) {
 		try {
+
+			UserInfo lUserInfo = (UserInfo) pHttpServletRequest.getSession()
+					.getAttribute(FacebookClient.getUserInfoSessionId());
+			Attendee lAttendee = mAttendeeDao.getAttendeeBySessionIdUserId(
+					pSessionId, lUserInfo.getUserId());
+
+			if (!lUserInfo.getUserRole().equals("ADMIN")
+					&& (lAttendee == null || !lAttendee.getSessionRole()
+							.equals("HOST"))) {
+				return Response
+						.status(Response.Status.FORBIDDEN)
+						.entity("{\"status\":\"forbidden\", \"message\":\"user does not have the previliege to perform the particular action\"}")
+						.build();
+			} // if
+
 			mSessionDao.deleteSessionById(pSessionId);
 			return Response.ok().entity("{\"status\":\"ok\"}").build();
 		} // try

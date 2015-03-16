@@ -35,7 +35,7 @@ public class Answer implements Serializable
 	
 	@JsonBackReference(value="question-answer")
 	@JoinColumn(name="QUESTION_ID")
-	@OneToOne(fetch = FetchType.EAGER)
+	@OneToOne(orphanRemoval=true, fetch = FetchType.EAGER)
 	private Question question;
 	
 	@Id
@@ -43,7 +43,7 @@ public class Answer implements Serializable
 	private String answerId;
 	
 	@Column(name = "ANSWER_CONTENT") 
-    private String content;
+    private String answerContent;
 	
 	@JoinColumn(name="ATTENDEE_ID")
 	@Column(name = "CREATED_BY") 
@@ -78,13 +78,13 @@ public class Answer implements Serializable
 		this.updateDate = updateDate;
 	}  // void setUpdateDate
 
-	public String getContent() {
-		return content;
-	}  // String getContent
+	public String getAnswerContent() {
+		return answerContent;
+	}  // String getAnswerContent
 
-	public void setContent(String content) {
-		this.content = content;
-	}  // void setContent
+	public void setAnswerContent(String answerContent) {
+		this.answerContent = answerContent;
+	}  // void setAnswerContent
 	
     
 	public Attendee getCreatedBy() {

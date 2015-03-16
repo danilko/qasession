@@ -73,7 +73,12 @@ public class SpringUserTranslateDao implements UserTranslateDao
 		newUserTranslate.setFirstName(pUserTranslate.getFirstName());
 		newUserTranslate.setFirstName(pUserTranslate.getLastName());
 		
-		mEntityManager.createNativeQuery("INSERT INTO USERTRANSLATE (USER_ID,FB_USER_ID,FIRST_NAME,LAST_NAME) VALUES ('" + newUserTranslate.getUserId() + "','" + newUserTranslate.getFbUserId() + "','" + newUserTranslate.getFirstName() + "','" + newUserTranslate.getLastName() + "')").executeUpdate();
+		mEntityManager.createNativeQuery("INSERT INTO USERTRANSLATE (USER_ID,FB_USER_ID,FIRST_NAME,LAST_NAME) VALUES (?, ?, ?, ?)")
+		.setParameter(1, newUserTranslate.getUserId())
+		.setParameter(2, newUserTranslate.getFbUserId())
+		.setParameter(3, newUserTranslate.getFirstName())
+		.setParameter(4, newUserTranslate.getLastName())
+		.executeUpdate();
 		
 		return newUserTranslate;
 	}

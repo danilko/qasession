@@ -19,7 +19,6 @@ import javax.persistence.TemporalType;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name="SESSION")
@@ -43,13 +42,12 @@ public class Session implements Serializable
 	@Column(name = "SESSION_DESCRIPTION") 
 	private String sessionDescription;
 	
-	@JsonManagedReference(value="session-question")
 	@JoinColumn(name="SESSION_ID")
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval=true, fetch = FetchType.EAGER)
 	private List <Question> questions = new ArrayList<Question>(0);
 	
 	@JoinColumn(name="SESSION_ID")
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval=true, fetch = FetchType.EAGER)
 	private List <Attendee> attendees = new ArrayList<Attendee>(0);;
 	
 	@Column(name = "SESSION_MAX_QUESTION") 

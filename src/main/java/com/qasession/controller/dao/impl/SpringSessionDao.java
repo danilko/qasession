@@ -18,22 +18,21 @@ import com.qasession.controller.model.Session;
 import com.qasession.controller.utility.RandomStringGenerator;
 
 @Repository
-public class SpringSessionDao implements SessionDao
-{
+public class SpringSessionDao implements SessionDao {
 	@PersistenceContext(unitName = "getEntityManagerFactoryBean")
 	private EntityManager mEntityManager;
-	
-	
+
 	@Transactional(rollbackFor = Throwable.class)
 	public List<Session> getSessionsByKeyValue(String pKeyName, String pKeyValue) {
 		// Create query to find info
-		String lBasedQuery = "SELECT session_object FROM Session session_object WHERE session_object." + pKeyName + " LIKE :pKeyValue";
-		
+		String lBasedQuery = "SELECT session_object FROM Session session_object WHERE session_object."
+				+ pKeyName + " LIKE :pKeyValue";
+
 		Query lQuery = mEntityManager.createQuery(lBasedQuery);
 		lQuery = lQuery.setParameter("pKeyValue", pKeyValue);
 
 		List<?> lQueryList = lQuery.getResultList();
-		
+
 		// Create new list to store account
 		List<Session> lLists = new ArrayList<Session>(0);
 
@@ -56,59 +55,72 @@ public class SpringSessionDao implements SessionDao
 	@Transactional(rollbackFor = Throwable.class)
 	public Session getSessionById(String pSessionId) {
 		List<Session> lList = getSessionsByKeyValue("sessionId", pSessionId);
-		
-		if(lList.size() > 0)
-		{
+
+		if (lList.size() > 0) {
 			return lList.get(0);
-		}  // if
-		
+		} // if
+
 		return null;
-	}  // Session getSessionsById
+	} // Session getSessionsById
 
 	@Transactional(readOnly = false, rollbackFor = Throwable.class, propagation = Propagation.REQUIRED)
-	public Session createSession(Session pSession, String pUserId) throws Exception 
-	{
-		Session newSession = new Session();
+	public Session createSession(Session pSession, String pUserId)
+			throws Exception {
+		pSession.setSessionId(RandomStringGenerator
+				.generator(RandomStringGenerator.ID_LENTH));
 
-		newSession.setSessionId(RandomStringGenerator.generator(RandomStringGenerator.ID_LENTH));
-		
-		newSession.setSessionDescription(pSession.getSessionDescription());
-		newSession.setSessionTopic(pSession.getSessionTopic());
-		
-		newSession.setSessionDescription(pSession.getSessionDescription());
-		newSession.setUpdateDate(Calendar.getInstance());
-		
-		newSession.setSessionStatus(pSession.getSessionStatus());
-		
-		newSession.setSessionMaxQuestion(pSession.getSessionMaxQuestion());
-	
-		mEntityManager.createNativeQuery("INSERT INTO SESSION (SESSION_ID,SESSION_TOPIC,SESSION_DESCRIPTION,SESSION_STATUS,SESSION_MAX_QUESTION, UPDATE_DATE) VALUES ('" + newSession.getSessionId() + "','" + newSession.getSessionTopic() + "','" + newSession.getSessionDescription() + "','" + newSession.getSessionStatus() + "', " + newSession.getSessionMaxQuestion() + ", ?)").setParameter(1, newSession.getUpdateDate(), TemporalType.TIMESTAMP).executeUpdate();
-	
-		return getSessionById(newSession.getSessionId());
-	}  // createSession
+		mEntityManager
+				.createNativeQuery(
+						"INSERT INTO SESSION (SESSION_ID,SESSION_TOPIC,SESSION_DESCRIPTION,SESSION_STATUS,SESSION_MAX_QUESTION, UPDATE_DATE) VALUES (?, ?, ?, ?, ?, ?)")
+				.setParameter(1, pSession.getSessionId())
+				.setParameter(2, pSession.getSessionTopic())
+				.setParameter(3, pSession.getSessionDescription())
+				.setParameter(4, pSession.getSessionStatus())
+				.setParameter(5, pSession.getSessionMaxQuestion())
+				.setParameter(6, Calendar.getInstance(),
+						TemporalType.TIMESTAMP).executeUpdate();
+
+		return getSessionById(pSession.getSessionId());
+	} // createSession
 
 	@Transactional(readOnly = false, rollbackFor = Throwable.class)
-	public void deleteSessionById(String pSessionId) throws Exception {
+	public void deleteSessionById(String pSessionId) {
+		mEntityManager
+				.createQuery(
+						"DELETE FROM Answer answer_object WHERE answer_object.question.session.sessionId = :sessionId")
+				.setParameter("sessionId", pSessionId).executeUpdate();
 
-		mEntityManager.remove(getSessionById(pSessionId));
-	}  // deleteSessionById
+		mEntityManager
+				.createQuery(
+						"DELETE FROM Question question_object WHERE question_object.session.sessionId = :sessionId")
+				.setParameter("sessionId", pSessionId).executeUpdate();
+
+		mEntityManager
+				.createQuery(
+						"DELETE FROM Attendee attendee_object WHERE attendee_object.session.sessionId = :sessionId")
+				.setParameter("sessionId", pSessionId).executeUpdate();
+
+		mEntityManager
+				.createQuery(
+						"DELETE FROM Session session_object WHERE session_object.sessionId = :sessionId")
+				.setParameter("sessionId", pSessionId).executeUpdate();
+	} // deleteSessionById
 
 	@Transactional(readOnly = false, rollbackFor = Throwable.class)
-	public Session updateSession(Session pSession) 
-	{
+	public Session updateSession(Session pSession) {
 		Session oldSession = getSessionById(pSession.getSessionId());
-		
+
 		oldSession.setSessionDescription(pSession.getSessionDescription());
 		oldSession.setSessionTopic(pSession.getSessionTopic());
-		
+
 		oldSession.setSessionDescription(pSession.getSessionDescription());
 		oldSession.setUpdateDate(Calendar.getInstance());
-		
+
 		oldSession.setSessionStatus(pSession.getSessionStatus());
 		oldSession.setSessionMaxQuestion(pSession.getSessionMaxQuestion());
-		mEntityManager.createNativeQuery("UPDATE SESSION SET SESSION_TOPIC = '" + pSession.getSessionTopic() + "', SESSION_TOPIC'" + pSession.getSessionDescription() + "', SESSION_STATUS = '" + pSession.getSessionStatus() + "', SESSION_MAX_QUESTION = " + pSession.getSessionMaxQuestion() +" WHERE SESSION_ID = '" + pSession.getSessionId() + "'").executeUpdate();
-		
-		return getSessionById(oldSession.getSessionId());
-	}  // Session updateSession
 
-}  // class SpringSessionDao
+		mEntityManager.persist(oldSession);
+
+		return getSessionById(oldSession.getSessionId());
+	} // Session updateSession
+} // class SpringSessionDao

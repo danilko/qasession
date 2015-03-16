@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -24,6 +26,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class SecurityFilter implements Filter {
 
+	private static Logger LOGGER = LoggerFactory.getLogger(SecurityFilter.class);
+	
 	public void destroy() {
 	}
 
@@ -40,14 +44,12 @@ public class SecurityFilter implements Filter {
 		String lOAuthConsumerCodePath = lRequest.getRequestURI();
 		if(StringUtils.isNotBlank(lOAuthConsumerCodePath))
 		{
-			lOAuthConsumerCode = lOAuthConsumerCodePath.contains("/controller/OAuthConsumerCode");
+			lOAuthConsumerCode = lOAuthConsumerCodePath.contains("/controller/OAuthConsumerResponseCode");
 		} // if
 		
 		// Case 1 - OAuthConsumerCode endpoint with auth code
 		if(lOAuthConsumerCode)
 		{
-			System.out.println("Get from OAuthConsumerCode: " + lOAuthConsumerCode);
-			
 			String lAuthCode = lRequest.getParameter("code");
 			
 			if(StringUtils.isNotBlank(lAuthCode))
@@ -77,8 +79,8 @@ public class SecurityFilter implements Filter {
 				}  // try
 				catch(Exception pException)
 				{
-					System.out.println(pException.toString());
-				}
+					LOGGER.error(pException.toString());
+				}  // catch
 			}  //if
 		}  //if
 		
@@ -87,8 +89,6 @@ public class SecurityFilter implements Filter {
 
 		if(!lAuthorize && StringUtils.isNotBlank(lTokenHeader))
 		{
-			System.out.println("Get from Header: " + lTokenHeader);
-			
 			try
 			{
 				String lAccessToken = lTokenHeader.replace("Bearer ", "");
@@ -106,7 +106,7 @@ public class SecurityFilter implements Filter {
 			}  // try
 			catch(Exception pException)
 			{
-				System.out.println(pException.toString());
+				LOGGER.error(pException.toString());
 			}  // catch
 			
 		}  // if
@@ -117,8 +117,6 @@ public class SecurityFilter implements Filter {
 		
 		if(!lAuthorize && lUserInfo != null)
 		{
-			System.out.println("Get from Session: " + lUserInfo.getAccessToken());
-			
 			try
 			{
 				readURI(FacebookClient.getDebugTokenURI(lUserInfo.getAccessToken()));
@@ -129,8 +127,8 @@ public class SecurityFilter implements Filter {
 			}  // try
 			catch(Exception pException)
 			{
-				System.out.println(pException.toString());
-			}
+				LOGGER.error(pException.toString());
+			}  // catch
 			
 		}  // if
 		
@@ -177,9 +175,17 @@ public class SecurityFilter implements Filter {
 		pUserInfo.setFirstName(lNode.get("first_name").asText());
 		pUserInfo.setLastName(lNode.get("last_name").asText());
 		pUserInfo.setEmail(lNode.get("email").asText());
-		pSession.setAttribute(FacebookClient.getUserInfoSessionId(), pUserInfo);
+		if(FacebookClient.isAppAdminOauthIdentityID(pUserInfo.getFacebookProfileId()))
+		{
+			pUserInfo.setUserRole("ADMIN");
+		}  // if
+		else
+		{
+			pUserInfo.setUserRole("USER");
+		}  // else
 		
-	}
+		pSession.setAttribute(FacebookClient.getUserInfoSessionId(), pUserInfo);
+	}  // refreshSessionInfo
 	
 	private String readURI(String pURI) throws IOException
 	{

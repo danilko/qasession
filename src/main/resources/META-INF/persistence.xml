@@ -11,7 +11,7 @@
         <class>com.qasession.controller.model.Question</class>
         <class>com.qasession.controller.model.UserTranslate</class>
         <properties>
-            <property name="openjpa.Log" value="Runtime=TRACE,SQL=TRACE" />
+<property name="openjpa.Log" value="DefaultLevel=TRACE, Runtime=TRACE, Tool=TRACE, SQL=TRACE"/>
             <property name="openjpa.jdbc.DBDictionary"
                 value="org.apache.openjpa.jdbc.sql.PostgresDictionary" />
             <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema" />

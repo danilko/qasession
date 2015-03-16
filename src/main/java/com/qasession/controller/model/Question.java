@@ -3,6 +3,7 @@ package com.qasession.controller.model;
 import java.io.Serializable;
 import java.util.Calendar;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -43,8 +44,7 @@ public class Question implements Serializable
 	@Column(name = "QUESTION_CONTENT") 
 	private String questionContent;
 	
-	@JsonBackReference(value="question-answer")
-	@OneToOne(fetch=FetchType.EAGER)
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval=true, fetch=FetchType.EAGER)
 	@JoinColumn(name="QUESTION_ID")
 	private Answer answer;
 	

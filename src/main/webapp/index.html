@@ -66,22 +66,100 @@
 			</div>
 			<!--/.container-fluid -->
 		</nav>
+		<div id="divSessionAlertList"></div>
+		<!-- div #divSessionList -->
+		<div id="divSessionList">
+			<!-- Main component for a primary marketing message or call to action -->
+			<div>
+				<div class="text-right">
+					<a class="btn btn-primary" role="button" data-toggle="modal"
+						data-target="#modalNewSession">Create new session</a>
+				</div>
+			</div>
 
-		<!-- Main component for a primary marketing message or call to action -->
-		<div class="jumbotron">
-			<h1>Navbar example</h1>
-			<p>This example is a quick exercise to illustrate how the
-				default, static navbar and fixed to top navbar work. It includes the
-				responsive CSS and HTML, so it also adapts to your viewport and
-				device.</p>
-			<a class="btn btn-primary btn-lg" role="button" data-toggle="modal"
-				data-target="#myModal">Create new session</a>
+
+			<div class="table-responsive">
+				<table class="table table-striped table-hover">
+					<thead>
+						<tr>
+							<th>Session ID</th>
+							<th>Session Topic</th>
+							<th>Session Status</th>
+							<th>Session Role</th>
+							<th>Last Update</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody id="tbodySession">
+					</tbody>
+				</table>
+			</div>
+			<!-- <div class="table-responsive"> -->
 		</div>
+		<!-- div #divSessionList -->
+		<!-- div #divSessionDetail -->
+		<div id="divSessionDetail">
 
+			<div>
+				<div class="text-right">
+					<button type="button" class="btn btn-default"
+						onClick="NANESPACE_QA_SESSION.showSessionList();">Close</button>
+					<button type="button" id="buttonExistSessionSaveExistSession"
+						class="btn btn-primary">Save Changes</button>
+				</div>
+			</div>
+			<hr>
+			<div>
+				<form role="form">
+					<div class="form-group">
+						<label for="existSessionSessionTopic">Topic:</label> <input
+							type="text" class="form-control" id="existSessionSessionTopic"
+							placeholder="Enter Session Topic">
+					</div>
+					<div class="form-group">
+						<label for="existSessionSessionDescription">Description:</label>
+						<textarea class="form-control" rows="10"
+							id="existSessionSessionDescription"
+							placeholder="Enter Session Description"></textarea>
+					</div>
+					<div class="form-group">
+						<label for="existSessionSessionStatus">Status:</label> <select
+							class="form-control" id="existSessionSessionStatus">
+							<option>OPEN</option>
+							<option>CLOSE</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="existSessionSessionMaxQuestion">Max Numbers of
+							Question Per Attendee:</label> <input type="text" class="form-control"
+							id="existSessionSessionMaxQuestion" placeholder="1">
+					</div>
+				</form>
+			</div>
+			<hr>
+			<div id="divSessionDetailQuestions"></div>
+			<br/>
+			<div>
+				<form role="form">
+					<div class="form-group">
+						<label for="sessionQuestionContent">New Question:</label>
+						<textarea class="form-control" rows="10"
+							id="sessionQuestionContent" placeholder="Enter question content"></textarea>
+					</div>
+				</form>
 
+				<div class="text-right">
+					<button type="button" class="btn btn btn-primary" onClick="">Create
+						New Question</button>
+				</div>
+			</div>
+
+		</div>
+		<!-- div #divSessionDetail -->
 		<!-- Modal -->
-		<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
-			aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal fade" id="modalNewSession" tabindex="-1"
+			role="dialog" aria-labelledby="modalNewSessionLabel"
+			aria-hidden="true">
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -89,7 +167,8 @@
 							aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
-						<h4 class="modal-title" id="myModalLabel">Create new session</h4>
+						<h4 class="modal-title" id="modalNewSessionLabel">Create new
+							session</h4>
 					</div>
 					<div class="modal-body">
 						<form role="form">
@@ -126,24 +205,27 @@
 				</div>
 			</div>
 		</div>
-		<div class="container">
-			<div class="table-responsive">
-				<table class="table table-striped table-hover">
-					<thead>
-						<tr>
-							<th>Session ID</th>
-							<th>Session Topic</th>
-							<th>Session Status</th>
-							<th>Session Role</th>
-							<th>Last Update</th>
-							<th></th>
-						</tr>
-					</thead>
-					<tbody id="tbodySession">
-					</tbody>
-				</table>
+		<!-- Modal -->
+		<div class="modal fade" id="modalConfirmDialog" tabindex="-1"
+			role="dialog" aria-labelledby="modalConfirmDialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title" id="modalConfirmDialogLabel"></h4>
+					</div>
+					<div class="modal-body" id="modalConfirmDialogBody"></div>
+					<div class="modal-footer">
+						<button id="modalConfirmDialogButtonClose" type="button"
+							class="btn btn-default" data-dismiss="modal">Close</button>
+						<button id="modalConfirmDialogButtonConfirm" type="button"
+							class="btn btn-primary" data-dismiss="modal" onClick="">Confirm</button>
+					</div>
+				</div>
 			</div>
-			<!-- <div class="table-responsive"> -->
 		</div>
 	</div>
 	<!-- /container -->
