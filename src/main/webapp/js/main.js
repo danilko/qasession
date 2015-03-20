@@ -104,7 +104,7 @@ var NANESPACE_QA_SESSION = {
 														.append(
 																"<div id=\"divQuestion_"
 																		+ question.questionId
-																		+ "\"><span class=\"label label-primary\">Question</span>"
+																		+ "\"><span class=\"label label-primary\">Question</span> <span class=\"label label-info\">" + question.questionStatus + "</span>"
 																		//+ "<span class=\"label label-info\">Created By " + question.createdBy.userTranslate.firstName + " " + question.createdBy.userTranslate.lastName + "</span>"
 																		+ "<p>"
 																		+ question.questionContent
