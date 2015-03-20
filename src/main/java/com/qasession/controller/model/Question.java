@@ -15,7 +15,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -32,7 +31,6 @@ public class Question implements Serializable
 	 */
 	private static final long serialVersionUID = 2217994381777064845L;
 
-	@JsonBackReference(value="session-question")
 	@JoinColumn(name="SESSION_ID")
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Session session;

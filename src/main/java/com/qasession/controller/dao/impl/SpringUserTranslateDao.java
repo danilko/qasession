@@ -71,7 +71,7 @@ public class SpringUserTranslateDao implements UserTranslateDao
 		newUserTranslate.setUserId(RandomStringGenerator.generator(RandomStringGenerator.ID_LENTH));
 		newUserTranslate.setFbUserId(pUserTranslate.getFbUserId());
 		newUserTranslate.setFirstName(pUserTranslate.getFirstName());
-		newUserTranslate.setFirstName(pUserTranslate.getLastName());
+		newUserTranslate.setLastName(pUserTranslate.getLastName());
 		
 		mEntityManager.createNativeQuery("INSERT INTO USERTRANSLATE (USER_ID,FB_USER_ID,FIRST_NAME,LAST_NAME) VALUES (?, ?, ?, ?)")
 		.setParameter(1, newUserTranslate.getUserId())
@@ -85,7 +85,7 @@ public class SpringUserTranslateDao implements UserTranslateDao
 	
 	@Transactional(readOnly = false, rollbackFor = Throwable.class)
 	public void deleteUserTranslateById(String pUserId) throws Exception {
-		mEntityManager.remove(getUserTranslateById(pUserId));
+	//TODO: Determine if deletion is necessary as it will impact multiple session
 	}
 
 	@Transactional(readOnly = false, rollbackFor = Throwable.class)
@@ -94,7 +94,7 @@ public class SpringUserTranslateDao implements UserTranslateDao
 		UserTranslate oldUserTranslate = getUserTranslateById(pUserTranslate.getUserId());
 		oldUserTranslate.setFbUserId(pUserTranslate.getFbUserId());
 		oldUserTranslate.setFirstName(pUserTranslate.getFirstName());
-		oldUserTranslate.setFirstName(pUserTranslate.getLastName());
+		oldUserTranslate.setLastName(pUserTranslate.getLastName());
 		
 		mEntityManager.persist(oldUserTranslate);
 		

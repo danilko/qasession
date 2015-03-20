@@ -21,10 +21,10 @@ public class UserInfo {
 	@JsonProperty("facebook_profile_id")
 	private String facebookProfileId;
 
-	@JsonProperty("first_name")
+	@JsonProperty("firstName")
 	private String firstName;
 
-	@JsonProperty("last_name")
+	@JsonProperty("lastName")
 	private String lastName;
 
 	@JsonProperty("userRole")

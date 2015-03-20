@@ -59,6 +59,8 @@ public class QuestionService {
 					.entity(mQuestionDao.getQuestionById(pQuestionId)).build();
 		} // try
 		catch (Exception pExeception) {
+
+			LOGGER.error(pExeception.toString());
 			return Response.serverError().build();
 		} // catch
 	} // Session getAllAttendeeOccurance
@@ -70,7 +72,7 @@ public class QuestionService {
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "Attendee ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
-	public Response updateSessionAttendee(
+	public Response updateSessionQuestion(
 			@PathParam("sessionId") String pSessionId,
 			@PathParam("questionId") String pQuestionId, Question pQuestion,
 			@Context HttpServletRequest pHttpServletRequest) {
@@ -113,7 +115,7 @@ public class QuestionService {
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "Attendee ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
-	public Response createSessionAttendee(
+	public Response createSessionqQuestion(
 			@PathParam("sessionId") String pSessionId, Question pQuestion,
 			@Context HttpServletRequest pHttpServletRequest) {
 		try {
@@ -132,7 +134,7 @@ public class QuestionService {
 			} // if
 
 			if (mQuestionDao.getQuestionsBySessionIdUserId(pSessionId,
-					lUserInfo.getUserId()).size() > lAttendee.getSession()
+					lUserInfo.getUserId()).size() >= lAttendee.getSession()
 					.getSessionMaxQuestion()) {
 				return Response
 						.status(Response.Status.FORBIDDEN)
@@ -147,6 +149,8 @@ public class QuestionService {
 					.build();
 		} // try
 		catch (Exception pExeception) {
+
+			LOGGER.error(pExeception.toString());
 			return Response.serverError().build();
 		} // catch
 	} // Session createSessionAttendee
@@ -157,7 +161,7 @@ public class QuestionService {
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "Question ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
-	public Response deleteSessionAttendee(
+	public Response deleteSessionQuestion(
 			@PathParam("sessionId") String pSessionId,
 			@PathParam("questionId") String pQuestionId,
 			@Context HttpServletRequest pHttpServletRequest) {

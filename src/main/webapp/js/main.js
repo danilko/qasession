@@ -86,8 +86,14 @@ var NANESPACE_QA_SESSION = {
 						$("#buttonExistSessionSaveExistSession").attr(
 								"onClick",
 								"NANESPACE_QA_SESSION.saveExistSession('"
-										+ data.sessionId + "')")
+										+ data.sessionId + "');")
 
+						$("#buttonSessionCreateQuestion").attr(
+								"onClick",
+								"NANESPACE_QA_SESSION.createQuestion('"
+										+ data.sessionId + "');")
+						$("#sessionQuestionContent").val("");				
+										
 						if (data.questions.length > 0) {
 							$("#divSessionDetailQuestions").empty();
 							$
@@ -96,14 +102,26 @@ var NANESPACE_QA_SESSION = {
 											function(i, question) {
 												$("#divSessionDetailQuestions")
 														.append(
-																"<blockquote><span class=\"label label-primary\">Question</span><p> "
+																"<div id=\"divQuestion_"
+																		+ question.questionId
+																		+ "\"><span class=\"label label-primary\">Question</span>"
+																		//+ "<span class=\"label label-info\">Created By " + question.createdBy.userTranslate.firstName + " " + question.createdBy.userTranslate.lastName + "</span>"
+																		+ "<p>"
 																		+ question.questionContent
-																		+ " </p><p class=\"text-right\"><a href=\"#\" onClick=\"NANESPACE_QA_SESSION.editQuestion('" + data.sessionId + "', '" + question.questionId +  "');\"><span class=\"glyphicon glyphicon-trash\"><a href=\"#\" onClick=\"NANESPACE_QA_SESSION.deleteQuestion('" + data.sessionId + "', '" + question.questionId +  "');\"><span class=\"glyphicon glyphicon-trash\"></span></a></p></blockquote>");
+																		+ "</p><p class=\"text-right\"><a href=\"#\" onClick=\"NANESPACE_QA_SESSION.editQuestion('"
+																		+ question.session.sessionId
+																		+ "', '"
+																		+ question.questionId
+																		+ "');\"><span class=\"glyphicon glyphicon-th-list\"> <a href=\"#\" onClick=\"NANESPACE_QA_SESSION.deleteQuestion('"
+																		+ question.session.sessionId
+																		+ "', '"
+																		+ question.questionId
+																		+ "');\"><span class=\"glyphicon glyphicon-trash\"></span></a></p></div>");
 												if (question.answer != null) {
 													$(
 															"#divSessionDetailQuestions")
 															.append(
-																	"<blockquote><span class=\"label label-success\">Answer</span><p> "
+																	"<blockquote><span class=\"label label-success\">Answer</span> <span class=\"label label-info\">Created By " + question.answer.createdBy.userTranslate.firstName + " " + question.answer.createdBy.userTranslate.lastName + "</span><p> "
 																			+ question.answer.answerContent
 																			+ " </p></blockquote>");
 												} // if
@@ -111,8 +129,7 @@ var NANESPACE_QA_SESSION = {
 						} // if
 						else {
 							$("#divSessionDetailQuestions")
-									.html(
-											"There is no question yet, please use [Create Question] to create one now");
+							.append("<div id=\"divQuestion_empty_question\">There is no question yet, please use [Create Question] to create one now</div>");
 
 						} // else
 
@@ -132,7 +149,7 @@ var NANESPACE_QA_SESSION = {
 			success : function(data) {
 
 				$("#span_user_name").html(
-						" " + data.first_name + " " + data.last_name);
+						" " + data.firstName + " " + data.lastName);
 				// NANESPACE_QA_SESSION.storeCookie('QA_SESSION_UI_COOKIE' ,
 				// data);
 			}, // success
@@ -221,7 +238,7 @@ var NANESPACE_QA_SESSION = {
 								+ alertType + ": </strong>" + alertMessage
 								+ "</div>");
 
-	},  // addSessionAlert : function(alertType, alertMessage)
+	}, // addSessionAlert : function(alertType, alertMessage)
 	saveExistSession : function(sessionId) {
 		var sessionObject = new Object();
 		sessionObject.sessionTopic = $("#existSessionSessionTopic").val();
@@ -285,12 +302,47 @@ var NANESPACE_QA_SESSION = {
 					}
 				});
 	}, // deleteSession : function()
+	createQuestion : function(sessionId) {
+		var questionObject = new Object();
+		questionObject.questionStatus = "OPEN";
+		questionObject.questionContent = $("#sessionQuestionContent").val();
+
+		$
+				.ajax({
+					type : 'POST',
+					url : 'rest/session/' + sessionId + "/question",
+					contentType : 'application/json',
+					data : JSON.stringify(questionObject),
+					dataType : 'json',
+					success : function(data) {
+
+						NANESPACE_QA_SESSION.showSessionDetail(data.session.sessionId);
+						NANESPACE_QA_SESSION.addSessionAlert("SUCCESS",
+								"The question is added now.");
+
+					}, // success
+					error : function(jqXHR, textStatus, errorThrown) {
+						alertMessage = "";
+						if (jqXHR.status == 403)
+						{
+							alertMessage = "This operation is not allowed"
+						}  // if
+						else
+						{
+							alertMessage = "There is something wrong with backend, please try again later."
+						}  // else
+						NANESPACE_QA_SESSION
+						.addSessionAlert("FAILURE", alertMessage);
+					}
+				});
+	}, // deleteSession : function()
 	deleteQuestion : function(sessionId, questionId) {
 
 		$
 				.ajax({
 					type : 'DELETE',
-					url : 'rest/session/' + sessionId + "/question/" + questionId,
+					url : 'rest/session/' + sessionId + "/question/"
+							+ questionId,
 					contentType : 'application/json',
 					dataType : 'json',
 					success : function(data) {
@@ -301,10 +353,17 @@ var NANESPACE_QA_SESSION = {
 
 					}, // success
 					error : function(jqXHR, textStatus, errorThrown) {
-
+						alertMessage = "";
+						if (jqXHR.status == 403)
+						{
+							alertMessage = "This operation is not allowed"
+						}  // if
+						else
+						{
+							alertMessage = "There is something wrong with backend, please try again later."
+						}  // else
 						NANESPACE_QA_SESSION
-								.addSessionAlert("FAILURE",
-										"There is something wrong with backend, please try again later.");
+						.addSessionAlert("FAILURE", alertMessage);
 					}
 				});
 	}, // deleteSession : function()
@@ -321,16 +380,23 @@ var NANESPACE_QA_SESSION = {
 						NANESPACE_QA_SESSION.redirectUser;
 					}, // success
 					error : function(jqXHR, textStatus, errorThrown) {
+						alertMessage = "";
+						if (jqXHR.status == 403)
+						{
+							alertMessage = "This operation is not allowed"
+						}  // if
+						else
+						{
+							alertMessage = "There is something wrong with backend, please try again later."
+						}  // else
 						NANESPACE_QA_SESSION
-								.addSessionAlert("FAILURE",
-										"There is something wrong with backend, please try again later.");
-
+						.addSessionAlert("FAILURE", alertMessage);
 					}
 				});
 	}, // showUserID:function
 	redirectUser : function() {
 		window.location.replace(window.location.href);
-	}  // redirectUser : function
+	} // redirectUser : function
 }
 
 NANESPACE_QA_SESSION.showUserID();

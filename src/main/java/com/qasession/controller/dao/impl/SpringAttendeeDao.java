@@ -103,7 +103,7 @@ public class SpringAttendeeDao implements AttendeeDao {
 
 		Query lQuery = mEntityManager.createQuery(lBasedQuery);
 		lQuery = lQuery.setParameter("pSessionId", pSessionId);
-		lQuery = lQuery.setParameter("pUserId", pSessionId);
+		lQuery = lQuery.setParameter("pUserId", pUserId);
 
 		List<?> lQueryList = lQuery.getResultList();
 
@@ -136,12 +136,12 @@ public class SpringAttendeeDao implements AttendeeDao {
 				.createQuery(
 						"DELETE FROM Answer answer_object WHERE answer_object.question.createBy.attendeeId = :attendeeId")
 				.setParameter("attendeeId", pAttendeeId).executeUpdate();
-
+		mEntityManager.flush();
 		mEntityManager
 				.createQuery(
 						"DELETE FROM Question question_object WHERE question_object.createBy.attendeeId = :attendeeId")
 				.setParameter("attendeeId", pAttendeeId).executeUpdate();
-
+		mEntityManager.flush();
 		mEntityManager
 				.createQuery(
 						"DELETE FROM Attendee attendee_object WHERE attendee_object.attendeeId = :attendeeId")

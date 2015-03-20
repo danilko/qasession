@@ -89,17 +89,17 @@ public class SpringSessionDao implements SessionDao {
 				.createQuery(
 						"DELETE FROM Answer answer_object WHERE answer_object.question.session.sessionId = :sessionId")
 				.setParameter("sessionId", pSessionId).executeUpdate();
-
+		mEntityManager.flush();
 		mEntityManager
 				.createQuery(
 						"DELETE FROM Question question_object WHERE question_object.session.sessionId = :sessionId")
 				.setParameter("sessionId", pSessionId).executeUpdate();
-
+		mEntityManager.flush();
 		mEntityManager
 				.createQuery(
 						"DELETE FROM Attendee attendee_object WHERE attendee_object.session.sessionId = :sessionId")
 				.setParameter("sessionId", pSessionId).executeUpdate();
-
+		mEntityManager.flush();
 		mEntityManager
 				.createQuery(
 						"DELETE FROM Session session_object WHERE session_object.sessionId = :sessionId")

@@ -55,7 +55,7 @@ public class SpringQuestionDao implements QuestionDao {
 	public List<Question> getQuestionsBySessionIdUserId(String pSessionId,
 			String pUserId) {
 		// Create query to find info
-		String lBasedQuery = "SELECT question_object FROM Question question_object WHERE question_object.session.sessionId = :sessionId AND question_object.createBy.userTranslate.userId = :userId";
+		String lBasedQuery = "SELECT question_object FROM Question question_object WHERE question_object.session.sessionId = :sessionId AND question_object.createdBy.userTranslate.userId = :userId";
 
 		Query lQuery = mEntityManager.createQuery(lBasedQuery);
 		lQuery = lQuery.setParameter("sessionId", pSessionId).setParameter(
@@ -105,9 +105,9 @@ public class SpringQuestionDao implements QuestionDao {
 				.setParameter(2, pQuestion.getQuestionContent())
 				.setParameter(3,
 						pQuestion.getSession().getSessionId())
-				.setParameter(4, pQuestion.getQuestionStatus())
-				.setParameter(5,
+				.setParameter(4,
 						pQuestion.getCreatedBy().getAttendeeId())
+				.setParameter(5, pQuestion.getQuestionStatus())
 				.setParameter(6, Calendar.getInstance(),
 						TemporalType.TIMESTAMP).executeUpdate();
 
@@ -120,7 +120,7 @@ public class SpringQuestionDao implements QuestionDao {
 				.createQuery(
 						"DELETE FROM Answer answer_object WHERE answer_object.question.questionId = :questionId")
 				.setParameter("questionId", pQuestionId).executeUpdate();
-
+		mEntityManager.flush();
 		mEntityManager
 				.createQuery(
 						"DELETE FROM Question question_object WHERE question_object.questionId = :questionId")
