@@ -5,16 +5,11 @@ import java.util.Calendar;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -22,7 +17,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 
 @Entity
-@Table(name="ANSWER")
+@Table(name="answer")
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="answerId")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -34,33 +29,37 @@ public class Answer implements Serializable
 	 */
 	private static final long serialVersionUID = -2033509333352468767L;
 	
-	@JsonBackReference(value="question-answer")
-	@JoinColumn(name="QUESTION_ID")
-	@OneToOne(orphanRemoval=true, fetch = FetchType.EAGER)
-	private Question question;
-	
 	@Id
-	@Column(name = "ANSWER_ID", unique = true, nullable = false) 
+	@Column(name = "answer_id", unique = true, nullable = false) 
 	private String answerId;
 	
-	@Column(name = "ANSWER_CONTENT") 
+	@Column(name = "question_id") 
+	private String questionId;
+	
+	
+	@Column(name = "answer_content") 
     private String answerContent;
 	
-	@JoinColumn(name="ATTENDEE_ID")
-	@Column(name = "CREATED_BY") 
-	@ManyToOne(fetch=FetchType.EAGER)
-    private Attendee createdBy;
-
-	@Column(name = "UPDATE_DATE", nullable = false) 
-	@Temporal(TemporalType.DATE) 
-	private Calendar updateDate;
+	@Column(name = "created_by") 
+    private String createdBy;
 	
-    public Question getQuestion() {
-		return question;
+	@Column(name = "updated_by") 
+    private String updatedBy;
+	
+	@Column(name = "update_timestamp", nullable = false)  
+	@Temporal(TemporalType.TIMESTAMP) 
+    private Calendar updateTimestamp;
+	
+	@Column(name = "create_timestamp", nullable = false)  
+	@Temporal(TemporalType.TIMESTAMP) 
+    private Calendar createTimestamp;
+	
+    public String getQuestionId() {
+		return questionId;
 	}
 
-	public void setQuestion(Question question) {
-		this.question = question;
+	public void setQuestionId(String questionId) {
+		this.questionId = questionId;
 	}
 
 	public String getAnswerId() {
@@ -71,12 +70,12 @@ public class Answer implements Serializable
 		this.answerId = answerId;
 	}  // void setAnswerId
 	
-	public Calendar getUpdateDate() {
-		return updateDate;
-	}  // getUpdateDate
+	public Calendar getUpdateTimestamp() {
+		return updateTimestamp;
+	}  // Date getUpdateTimestamp
 
-	public void setUpdateDate(Calendar updateDate) {
-		this.updateDate = updateDate;
+	public void setUpdateTimestamp(Calendar updateTimestamp) {
+		this.updateTimestamp = updateTimestamp;
 	}  // void setUpdateDate
 
 	public String getAnswerContent() {
@@ -88,11 +87,27 @@ public class Answer implements Serializable
 	}  // void setAnswerContent
 	
     
-	public Attendee getCreatedBy() {
+	public String getCreatedBy() {
 		return createdBy;
 	}
 
-	public void setCreatedBy(Attendee createdBy) {
+	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
+	}
+
+	public String getUpdatedBy() {
+		return updatedBy;
+	}
+
+	public void setUpdatedBy(String updatedBy) {
+		this.updatedBy = updatedBy;
+	}
+
+	public Calendar getCreateTimestamp() {
+		return createTimestamp;
+	}
+
+	public void setCreateTimestamp(Calendar createTimestamp) {
+		this.createTimestamp = createTimestamp;
 	}
 }  // class Answer

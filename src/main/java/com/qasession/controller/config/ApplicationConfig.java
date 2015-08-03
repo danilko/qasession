@@ -15,7 +15,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.qasession.controller.service.AnswerService;
 import com.qasession.controller.service.AttendeeService;
 import com.qasession.controller.service.QuestionService;
-import com.qasession.controller.service.SessionService;
+import com.qasession.controller.service.QASessionService;
 import com.qasession.controller.service.UserService;
 
 @Configuration
@@ -54,9 +54,9 @@ public class ApplicationConfig {
 	}  // public AttendeeService getAttendeeService()
 	
 	@Bean
-	public SessionService getSessionService()
+	public QASessionService getSessionService()
 	{
-		return new SessionService();
+		return new QASessionService();
 	}  // public SessionService getSessionService()
 
 	@Bean

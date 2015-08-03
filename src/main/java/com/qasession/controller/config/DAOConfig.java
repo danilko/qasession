@@ -20,12 +20,12 @@ import com.jolbox.bonecp.BoneCPDataSource;
 import com.qasession.controller.dao.AnswerDao;
 import com.qasession.controller.dao.AttendeeDao;
 import com.qasession.controller.dao.QuestionDao;
-import com.qasession.controller.dao.SessionDao;
+import com.qasession.controller.dao.QASessionDao;
 import com.qasession.controller.dao.UserTranslateDao;
 import com.qasession.controller.dao.impl.SpringAnswerDao;
 import com.qasession.controller.dao.impl.SpringAttendeeDao;
 import com.qasession.controller.dao.impl.SpringQuestionDao;
-import com.qasession.controller.dao.impl.SpringSessionDao;
+import com.qasession.controller.dao.impl.SpringQASessionDao;
 import com.qasession.controller.dao.impl.SpringUserTranslateDao;
 
 @Configuration
@@ -55,10 +55,10 @@ public class DAOConfig
 	}  // QuestionDao getQuestionDao
 	
 	@Bean
-	public SessionDao getSessionDao()
+	public QASessionDao getQASessionDao()
 	{
-		return new SpringSessionDao();
-	}  // SessionDao getSessionDao
+		return new SpringQASessionDao();
+	}  // SessionDao getQASessionDao
 	
 	
 	@Bean

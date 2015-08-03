@@ -66,44 +66,46 @@ public class SpringAttendeeDao implements AttendeeDao {
 
 		mEntityManager
 				.createNativeQuery(
-						"INSERT INTO ATTENDEE (ATTENDEE_ID,SESSION_ID,USER_ID,SESSION_ROLE,UPDATE_DATE) VALUES (?, ?, ?, ?, ?)")
+						"INSERT INTO attendee (attendee_id, qasession_id, user_id,qasession_role,create_timestamp,update_timestamp) VALUES (?, ?, ?, ?, ?, ?)")
 				.setParameter(1, pAttendee.getAttendeeId())
 				.setParameter(2,
-						pAttendee.getSession().getSessionId())
+						pAttendee.getQASessionId())
 				.setParameter(3,
-						pAttendee.getUserTranslate().getUserId())
-				.setParameter(4, pAttendee.getSessionRole())
+						pAttendee.getUserId())
+				.setParameter(4, pAttendee.getQASessionRole())
 				.setParameter(5, Calendar.getInstance(),
-						TemporalType.TIMESTAMP).executeUpdate();
+						TemporalType.TIMESTAMP)
+				.setParameter(6, Calendar.getInstance(),
+						TemporalType.TIMESTAMP)
+						.executeUpdate();
 
-		return getAttendeeBySessionIdUserId(pAttendee.getSession()
-				.getSessionId(), pAttendee.getUserTranslate().getUserId());
+		return getAttendeeByQASessionIdUserId(pAttendee.getQASessionId(), pAttendee.getUserId());
 	} // Attendee createAttendee
 
 	@Transactional(rollbackFor = Throwable.class)
 	public Attendee updateAttende(Attendee pAttendee) throws Exception {
-		Attendee oldAttendee = getAttendeeBySessionIdUserId(pAttendee
-				.getSession().getSessionId(), pAttendee.getUserTranslate()
+		Attendee oldAttendee = getAttendeeByQASessionIdUserId(pAttendee
+				.getQASessionId(), pAttendee
 				.getUserId());
 
-		oldAttendee.setSessionRole(pAttendee.getSessionRole());
+		oldAttendee.setQASessionRole(pAttendee.getQASessionRole());
 
 		mEntityManager.persist(oldAttendee);
 
-		return getAttendeeBySessionIdUserId(oldAttendee.getSession()
-				.getSessionId(), oldAttendee.getUserTranslate().getUserId());
+		return getAttendeeByQASessionIdUserId(oldAttendee
+				.getQASessionId(), oldAttendee.getUserId());
 	} // Attendee updateAttende
 
 	@Transactional(rollbackFor = Throwable.class)
-	public Attendee getAttendeeBySessionIdUserId(String pSessionId,
+	public Attendee getAttendeeByQASessionIdUserId(String pQASessionId,
 			String pUserId) throws Exception {
 
 		// Create query to find info
-		String lBasedQuery = "SELECT attendee_object FROM Attendee attendee_object WHERE attendee_object.session.sessionId LIKE :pSessionId AND attendee_object.userTranslate.userId LIKE :pUserId";
+		String lBasedQuery = "SELECT attendee_object FROM Attendee attendee_object WHERE attendee_object.qasessionId LIKE :qasessionId AND attendee_object.userId LIKE :userId";
 
 		Query lQuery = mEntityManager.createQuery(lBasedQuery);
-		lQuery = lQuery.setParameter("pSessionId", pSessionId);
-		lQuery = lQuery.setParameter("pUserId", pUserId);
+		lQuery = lQuery.setParameter("qasessionId", pQASessionId);
+		lQuery = lQuery.setParameter("userId", pUserId);
 
 		List<?> lQueryList = lQuery.getResultList();
 
@@ -131,20 +133,13 @@ public class SpringAttendeeDao implements AttendeeDao {
 	} // Attendee getAttendeeBySessionIdAttendeeEmail
 
 	@Transactional(rollbackFor = Throwable.class)
-	public void deleteAttendeeByAttendeeId(String pAttendeeId) throws Exception {
+	public void deleteAttendeeByQASessionIdUserId(String pQASessionId,
+			String pUserId) throws Exception {
 		mEntityManager
 				.createQuery(
-						"DELETE FROM Answer answer_object WHERE answer_object.question.createBy.attendeeId = :attendeeId")
-				.setParameter("attendeeId", pAttendeeId).executeUpdate();
-		mEntityManager.flush();
-		mEntityManager
-				.createQuery(
-						"DELETE FROM Question question_object WHERE question_object.createBy.attendeeId = :attendeeId")
-				.setParameter("attendeeId", pAttendeeId).executeUpdate();
-		mEntityManager.flush();
-		mEntityManager
-				.createQuery(
-						"DELETE FROM Attendee attendee_object WHERE attendee_object.attendeeId = :attendeeId")
-				.setParameter("attendeeId", pAttendeeId).executeUpdate();
+						"DELETE FROM Attendee attendee_object WHERE attendee_object.userId = :userId AND attendee_object.qasessionId = :qasessionId")
+				.setParameter("qasessionId", pUserId)
+				.setParameter("userId", pUserId)
+				.executeUpdate();
 	} // void deleteAttendeeBySessionIdUserId
 } // SpringAttendeeDao

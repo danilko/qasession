@@ -59,12 +59,15 @@ public class SpringAnswerDao implements AnswerDao {
 
 		mEntityManager
 				.createNativeQuery(
-						"INSERT INTO ANSWER (ANSWER_ID,ANSWER_CONTENT,QUESTION_ID,CREATED_BY,UPDATE_DATE) VALUES (:answerId, :answerContent, :questionId, :createBy, :updateDate)")
-				.setParameter("answerId", pAnswer.getAnswerId())
-				.setParameter("answerContent", pAnswer.getAnswerContent())
-				.setParameter("createBy",
-						pAnswer.getCreatedBy().getAttendeeId())
-				.setParameter("updateDate", Calendar.getInstance(),
+						"INSERT INTO answer (answer_id,answer_content,question_id,created_by,updated_by,create_timestamp,update_timestamp) VALUES (?, ?, ?, ?, ?, ?, ?)")
+				.setParameter(1, pAnswer.getAnswerId())
+				.setParameter(2, pAnswer.getAnswerContent())
+				.setParameter(3, pAnswer.getQuestionId())
+				.setParameter(4, pAnswer.getCreatedBy())
+				.setParameter(5, pAnswer.getUpdatedBy())
+				.setParameter(6, Calendar.getInstance(),
+						TemporalType.TIMESTAMP)
+				.setParameter(7, Calendar.getInstance(),
 						TemporalType.TIMESTAMP).executeUpdate();
 
 		return getAnswerById(pAnswer.getAnswerId());
@@ -82,8 +85,9 @@ public class SpringAnswerDao implements AnswerDao {
 	public Answer updateAnswerById(Answer pAnswer) throws Exception {
 		Answer oldAnswer = getAnswerById(pAnswer.getAnswerId());
 		oldAnswer.setCreatedBy(pAnswer.getCreatedBy());
+		oldAnswer.setUpdatedBy(pAnswer.getUpdatedBy());
 		oldAnswer.setAnswerContent(pAnswer.getAnswerContent());
-		oldAnswer.setUpdateDate(Calendar.getInstance());
+		oldAnswer.setUpdateTimestamp(Calendar.getInstance());
 
 		mEntityManager.persist(oldAnswer);
 

@@ -5,10 +5,7 @@ import java.util.Calendar;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -19,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
-@Table(name="ATTENDEE")
+@Table(name="attendee")
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="attendeeId")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -28,24 +25,26 @@ public class Attendee implements Serializable
 	private static final long serialVersionUID = 223575325135709928L;
 
 	@Id
-	@Column(name = "ATTENDEE_ID") 
+	@Column(name = "attendee_id") 
 	private String attendeeId;
 
-	@JoinColumn(name="SESSION_ID")
-	@ManyToOne(fetch = FetchType.EAGER)
-	private Session session;
+	@Column(name="qasession_id")
+	private String qasessionId;
 	
-	@JoinColumn(name = "USER_ID")
-	@ManyToOne(fetch = FetchType.EAGER)
-	private UserTranslate userTranslate;
+	@Column(name = "user_id")
+	private String userId;
+
+
+	@Column(name = "qasession_role", nullable = false)  
+	private String qasessionRole;
 	
-	@Column(name = "SESSION_ROLE", nullable = false)  
-	private String sessionRole;
+	@Column(name = "update_timestamp", nullable = false)  
+	@Temporal(TemporalType.TIMESTAMP) 
+    private Calendar updateTimestamp;
 	
-	@Column(name = "UPDATE_DATE", nullable = false) 
-	@Temporal(TemporalType.DATE) 
-	private Calendar updateDate;
-	
+	@Column(name = "create_timestamp", nullable = false)  
+	@Temporal(TemporalType.TIMESTAMP) 
+    private Calendar createTimestamp;
 	
 	public String getAttendeeId() {
 		return attendeeId;
@@ -55,35 +54,43 @@ public class Attendee implements Serializable
 		this.attendeeId = attendeeId;
 	}
 	
-	public Session getSession() {
-		return session;
+	public String getQASessionId() {
+		return qasessionId;
 	}
 
-	public void setSession(Session session) {
-		this.session = session;
-	}
-	
-	public Calendar getUpdateDate() {
-		return updateDate;
+	public void setQASessionId(String sessionId) {
+		this.qasessionId = sessionId;
 	}
 
-	public void setUpdateDate(Calendar updateDate) {
-		this.updateDate = updateDate;
+	public Calendar getCreateTimestamp() {
+		return createTimestamp;
 	}
 
-	public UserTranslate getUserTranslate() {
-		return userTranslate;
+	public void setCreateTimestamp(Calendar createTimestamp) {
+		this.createTimestamp = createTimestamp;
 	}
 
-	public void setUserTranslate(UserTranslate userTranslate) {
-		this.userTranslate = userTranslate;
-	}
-
-	public String getSessionRole() {
-		return sessionRole;
+	public String getQASessionRole() {
+		return qasessionRole;
 	}  // String getSessionRole
 
-	public void setSessionRole(String sessionRole) {
-		this.sessionRole = sessionRole;
+	public void setQASessionRole(String qasessionRole) {
+		this.qasessionRole = qasessionRole;
 	}  // void setSessionRole
+	
+	public String getUserId() {
+		return userId;
+	}  // String getUserId
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}  // void setUserId
+
+	public Calendar getUpdateTimestamp() {
+		return updateTimestamp;
+	}  // Calendar getUpdateTimestamp
+
+	public void setUpdateTimestamp(Calendar updateTimestamp) {
+		this.updateTimestamp = updateTimestamp;
+	}  // setUpdateTimestamp
 }  // class Attendee

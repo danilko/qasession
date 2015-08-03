@@ -55,10 +55,10 @@ public class SpringQuestionDao implements QuestionDao {
 	public List<Question> getQuestionsBySessionIdUserId(String pSessionId,
 			String pUserId) {
 		// Create query to find info
-		String lBasedQuery = "SELECT question_object FROM Question question_object WHERE question_object.session.sessionId = :sessionId AND question_object.createdBy.userTranslate.userId = :userId";
+		String lBasedQuery = "SELECT question_object FROM Question question_object WHERE question_object.qasessionId = :qasessionId AND question_object.createdBy = :userId";
 
 		Query lQuery = mEntityManager.createQuery(lBasedQuery);
-		lQuery = lQuery.setParameter("sessionId", pSessionId).setParameter(
+		lQuery = lQuery.setParameter("qasessionId", pSessionId).setParameter(
 				"userId", pUserId);
 
 		List<?> lQueryList = lQuery.getResultList();
@@ -100,16 +100,21 @@ public class SpringQuestionDao implements QuestionDao {
 
 		mEntityManager
 				.createNativeQuery(
-						"INSERT INTO QUESTION (QUESTION_ID,QUESTION_CONTENT,SESSION_ID,CREATED_BY,QUESTION_STATUS,UPDATE_DATE) VALUES (?, ?, ?, ?, ?, ?)")
+						"INSERT INTO question (question_id,question_content,qasession_id,created_by, updated_by ,question_status,create_timestamp,update_timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
 				.setParameter(1, pQuestion.getQuestionId())
 				.setParameter(2, pQuestion.getQuestionContent())
 				.setParameter(3,
-						pQuestion.getSession().getSessionId())
+						pQuestion.getQASessionId())
 				.setParameter(4,
-						pQuestion.getCreatedBy().getAttendeeId())
-				.setParameter(5, pQuestion.getQuestionStatus())
-				.setParameter(6, Calendar.getInstance(),
-						TemporalType.TIMESTAMP).executeUpdate();
+						pQuestion.getCreatedBy())
+				.setParameter(5,
+						pQuestion.getUpdatedBy())
+				.setParameter(6, pQuestion.getQuestionStatus())
+				.setParameter(7, Calendar.getInstance(),
+						TemporalType.TIMESTAMP)
+				.setParameter(8, Calendar.getInstance(),
+						TemporalType.TIMESTAMP)
+						.executeUpdate();
 
 		return getQuestionById(pQuestion.getQuestionId());
 	} // Question createQuestion
@@ -118,7 +123,7 @@ public class SpringQuestionDao implements QuestionDao {
 	public void deleteQuestionById(String pQuestionId) {
 		mEntityManager
 				.createQuery(
-						"DELETE FROM Answer answer_object WHERE answer_object.question.questionId = :questionId")
+						"DELETE FROM Answer answer_object WHERE answer_object.questionId = :questionId")
 				.setParameter("questionId", pQuestionId).executeUpdate();
 		mEntityManager.flush();
 		mEntityManager
@@ -132,7 +137,13 @@ public class SpringQuestionDao implements QuestionDao {
 		Question oldQuestion = getQuestionById(pQuestion.getQuestionId());
 		oldQuestion.setQuestionStatus(pQuestion.getQuestionStatus());
 		oldQuestion.setQuestionContent(pQuestion.getQuestionContent());
-		oldQuestion.setUpdateDate(Calendar.getInstance());
+		
+		oldQuestion.setQASessionId(pQuestion.getQASessionId());
+		
+		oldQuestion.setUpdatedBy(pQuestion.getUpdatedBy());
+		oldQuestion.setCreatedBy(pQuestion.getCreatedBy());
+		
+		oldQuestion.setUpdateTimestamp(Calendar.getInstance());
 
 		mEntityManager.persist(oldQuestion);
 

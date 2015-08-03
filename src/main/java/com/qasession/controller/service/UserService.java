@@ -32,13 +32,13 @@ public class UserService {
 	private UserTranslateDao mUserTranslateDao;
 	
 	@GET
-	@ApiOperation(value = "Get current token info", notes = "Returns all attendee record that this session belong")
+	@ApiOperation(value = "Get current token info", notes = "Return user info for this user")
 	@ApiResponses(value = { @ApiResponse(code = 404, message = "Attendee ID not found"), @ApiResponse(code = 403, message = "Not authorized") })
 	public Response getUserTranslate(@Context HttpServletRequest pHttpServletRequest ) {
 		try {
 			UserInfo lUserInfo = (UserInfo)pHttpServletRequest.getSession().getAttribute(FacebookClient.getUserInfoSessionId());
 			
-			List <UserTranslate> lList = mUserTranslateDao.getUserTranslatesByKeyValue("fbUserId", lUserInfo.getFacebookProfileId());
+			List <UserTranslate> lList = mUserTranslateDao.getUserTranslatesByLoginUserIdTypeLoginUserType(lUserInfo.getFacebookProfileId(), "FACEBOOK");
 			
 			
 			UserTranslate lUserTranslate = null;
@@ -51,16 +51,15 @@ public class UserService {
 			if(lUserTranslate == null)
 			{
 				lUserTranslate = new UserTranslate();
-				lUserTranslate.setFbUserId(lUserInfo.getFacebookProfileId());
-				lUserTranslate.setFirstName(lUserInfo.getFirstName());
-				lUserTranslate.setLastName(lUserInfo.getLastName());
+				lUserTranslate.setFacebookUserId(lUserInfo.getFacebookProfileId());
+				lUserTranslate.setLoginUserIdType("FACEBOOK");
+				lUserTranslate.setName(lUserInfo.getName());
 				
 				lUserTranslate = mUserTranslateDao.createUserTranslate(lUserTranslate);
 			}  // if
 			else if(lUserInfo.getUserId() == null)
 			{
-				lUserTranslate.setFirstName(lUserInfo.getFirstName());
-				lUserTranslate.setLastName(lUserInfo.getLastName());
+				lUserTranslate.setName(lUserInfo.getName());
 				
 				lUserTranslate = mUserTranslateDao.updateUserTranslate(lUserTranslate);
 			}  // else if
@@ -109,7 +108,7 @@ public class UserService {
 			lSession.setAttribute(FacebookClient.getFacebookSessionCodeId(lUserInfo.getFacebookProfileId()), null);
 			lSession.setAttribute(FacebookClient.getFacebookSessionAccessTokenId(lUserInfo.getFacebookProfileId()), null);
 			lSession.setAttribute(FacebookClient.getFacebookSessioUserId(lUserInfo.getFacebookProfileId()), null);
-	
+			
 			return Response.ok().build();
 		} // try
 		catch (Exception pExeception) {

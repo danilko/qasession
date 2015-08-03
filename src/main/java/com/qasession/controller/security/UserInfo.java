@@ -15,17 +15,12 @@ public class UserInfo {
 	@JsonProperty("email")
 	private String email;
 
-	@JsonProperty("facebook_profile_link")
-	private String facebookProfileLink;
+	@JsonProperty("facebook_id")
+	private String facebookId;
 
-	@JsonProperty("facebook_profile_id")
-	private String facebookProfileId;
+	@JsonProperty("name")
+	private String name;
 
-	@JsonProperty("firstName")
-	private String firstName;
-
-	@JsonProperty("lastName")
-	private String lastName;
 
 	@JsonProperty("userRole")
 	private String userRole;
@@ -54,36 +49,20 @@ public class UserInfo {
 		this.expiresIn = expiresIn;
 	}
 
-	public String getFacebookProfileLink() {
-		return facebookProfileLink;
-	}
-
-	public void setFacebookProfileLink(String facebookProfileLink) {
-		this.facebookProfileLink = facebookProfileLink;
-	}
-
 	public String getFacebookProfileId() {
-		return facebookProfileId;
+		return facebookId;
 	}
 
-	public void setFacebookProfileId(String facebookProfileId) {
-		this.facebookProfileId = facebookProfileId;
+	public void setFacebookId(String facebookId) {
+		this.facebookId = facebookId;
 	}
 
-	public String getFirstName() {
-		return firstName;
+	public String getName() {
+		return name;
 	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getEmail() {

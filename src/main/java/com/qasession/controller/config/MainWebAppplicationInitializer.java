@@ -13,6 +13,8 @@ import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
+import com.wordnik.swagger.jaxrs.config.DefaultJaxrsConfig;
+
 
 public class MainWebAppplicationInitializer implements
 		WebApplicationInitializer {
@@ -32,9 +34,17 @@ public class MainWebAppplicationInitializer implements
 		pServletContext.addListener(new ContextLoaderListener(lRootContext));
 		
 		// Register and map the dispatcher servlet
-		ServletRegistration.Dynamic lDispatcher = pServletContext.addServlet(
+		ServletRegistration.Dynamic lCFXDispatcher = pServletContext.addServlet(
 				"CFXServlet", CXFServlet.class);
-		lDispatcher.addMapping("/rest/*");
+		lCFXDispatcher.addMapping("/rest/*");
+		
+		// Register and map the dispatcher servlet
+		//ServletRegistration.Dynamic lSwaggerDispatcher = pServletContext.addServlet(
+		//		"DefaultServletReaderConfig", DefaultJaxrsConfig.class);
+		//lSwaggerDispatcher.addMapping("/api/*");
+		
+		//lSwaggerDispatcher.setInitParameter("swagger.resource.package", "com.wordnik.swagger.sample.servlet");
+		//lSwaggerDispatcher.setInitParameter("api.version", "1.0.0");
 		
 	}
 } // class MainWebApplicationInitializer

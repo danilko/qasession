@@ -18,9 +18,11 @@ import org.slf4j.LoggerFactory;
 
 import com.qasession.controller.dao.AnswerDao;
 import com.qasession.controller.dao.AttendeeDao;
+import com.qasession.controller.dao.QASessionDao;
 import com.qasession.controller.dao.QuestionDao;
 import com.qasession.controller.model.Answer;
 import com.qasession.controller.model.Attendee;
+import com.qasession.controller.model.QASession;
 import com.qasession.controller.security.FacebookClient;
 import com.qasession.controller.security.UserInfo;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -28,7 +30,7 @@ import com.wordnik.swagger.annotations.ApiResponses;
 import com.wordnik.swagger.annotations.ApiResponse;
 
 @Produces("application/json")
-@Path("/session/{sessionId}/question/{questionId}/answer")
+@Path("/qasession/{qasessionId}/question/{questionId}/answer")
 public class AnswerService {
 	private static Logger LOGGER = LoggerFactory.getLogger(AnswerService.class);
 
@@ -36,6 +38,8 @@ public class AnswerService {
 	private AttendeeDao mAttendeeDao;
 	@Resource(shareable = true, name = "getAnswerDao")
 	private AnswerDao mAnswerDao;
+	@Resource(shareable = true, name = "getQASessionDao")
+	private QASessionDao mQASessionDao;
 	@Resource(shareable = true, name = "getQuestionDao")
 	private QuestionDao mQuestionDao;
 
@@ -45,11 +49,20 @@ public class AnswerService {
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "Attendee ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
-	public Response getAnswer(@PathParam("sessionId") String pSessionId,
+	public Response getAnswer(@PathParam("qasessionId") String pQASessionId,
 			@PathParam("questionId") String pQuestionId,
 			@PathParam("answerId") String pAnswerId) {
 		try {
-			return Response.ok().entity(mAnswerDao.getAnswerById(pAnswerId))
+            
+            Answer lAnswer = mAnswerDao.getAnswerById(pAnswerId);
+            
+			if (lAnswer == null)
+			{
+				return Response
+						.status(Response.Status.NOT_FOUND).build();
+			}  // if
+			
+			return Response.ok().entity(lAnswer)
 					.build();
 		} // try
 		catch (Exception pExeception) {
@@ -65,7 +78,7 @@ public class AnswerService {
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "Attendee ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
-	public Response updateAnswer(@PathParam("sessionId") String pSessionId,
+	public Response updateAnswer(@PathParam("qasessionId") String pQASessionId,
 			@PathParam("questionId") String pQuestionId,
 			@PathParam("answerId") String pAnswerId, Answer pAnswer,
 			@Context HttpServletRequest pHttpServletRequest) {
@@ -73,21 +86,34 @@ public class AnswerService {
 
 			UserInfo lUserInfo = (UserInfo) pHttpServletRequest.getSession()
 					.getAttribute(FacebookClient.getUserInfoSessionId());
-			Attendee lAttendee = mAttendeeDao.getAttendeeBySessionIdUserId(
-					pSessionId, lUserInfo.getUserId());
+			
+			Attendee lAttendee = mAttendeeDao.getAttendeeByQASessionIdUserId(
+					pQASessionId, lUserInfo.getUserId());
 
-			if (lUserInfo.getUserRole().equals("ADMIN") || lAttendee == null
-					|| !lAttendee.getSessionRole().equals("HOST")) {
+            QASession lQASession = mQASessionDao.getQASessionById(pQASessionId);
+            
+            Answer lAnswer = mAnswerDao.getAnswerById(pAnswerId);
+            
+			if (lAnswer == null)
+			{
 				return Response
-						.status(Response.Status.FORBIDDEN)
-						.entity("{\"status\":\"forbidden\", \"message\":\"user does not have the previliege to perform the particular action\"}")
+						.status(Response.Status.NOT_FOUND).build();
+			}  // if
+            
+			if (lUserInfo.getUserRole().equals("ADMIN") || 
+					(lAttendee != null && lQASession.getQASessionStatus().equals("OPEN") && lAttendee.getQASessionRole().equals("HOST"))) {
+				
+			    lAnswer.setAnswerContent(pAnswer.getAnswerContent());
+			    lAnswer.setUpdatedBy(lUserInfo.getUserId());
+				
+				mAnswerDao.updateAnswerById(lAnswer);
+				return Response.ok().entity(mAnswerDao.createAnswer(pAnswer))
 						.build();
 			} // if
-
-			pAnswer.setAnswerId(pAnswerId);
-			pAnswer.setQuestion(mQuestionDao.getQuestionById(pQuestionId));
-			mAnswerDao.updateAnswerById(pAnswer);
-			return Response.ok().entity(mAnswerDao.createAnswer(pAnswer))
+			
+			return Response
+					.status(Response.Status.FORBIDDEN)
+					.entity("{\"status\":\"forbidden\", \"message\":\"user does not have the previliege to perform the particular action\"}")
 					.build();
 		} // try
 		catch (Exception pExeception) {
@@ -99,29 +125,36 @@ public class AnswerService {
 	@POST
 	@Consumes("application/json")
 	@Path("/")
-	@ApiOperation(value = "Create an answer within a session id and a question id", notes = "")
+	@ApiOperation(value = "Create an answer within a qasession id and a question id", notes = "")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "Attendee ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
-	public Response createAnswer(@PathParam("sessionId") String pSessionId,
+	public Response createAnswer(@PathParam("qasessionId") String pQASessionId,
 			@PathParam("questionId") String pQuestionId, Answer pAnswer,
 			@Context HttpServletRequest pHttpServletRequest) {
 		try {
 
 			UserInfo lUserInfo = (UserInfo) pHttpServletRequest.getSession()
 					.getAttribute(FacebookClient.getUserInfoSessionId());
-			Attendee lAttendee = mAttendeeDao.getAttendeeBySessionIdUserId(
-					pSessionId, lUserInfo.getUserId());
+			Attendee lAttendee = mAttendeeDao.getAttendeeByQASessionIdUserId(
+					pQASessionId, lUserInfo.getUserId());
 
-			if (lAttendee == null || !lAttendee.getSessionRole().equals("HOST")) {
-				return Response
-						.status(Response.Status.FORBIDDEN)
-						.entity("{\"status\":\"forbidden\", \"message\":\"user does not have the previliege to perform the particular action\"}")
+            QASession lQASession = mQASessionDao.getQASessionById(pQASessionId);
+            
+			if (lUserInfo.getUserRole().equals("ADMIN") || 
+					(lAttendee != null && lQASession.getQASessionStatus().equals("OPEN") && lAttendee.getQASessionRole().equals("HOST"))) {
+				pAnswer.setQuestionId(pQuestionId);
+				
+				pAnswer.setCreatedBy(lUserInfo.getUserId());
+				pAnswer.setUpdatedBy(lUserInfo.getUserId());
+				
+				return Response.ok().entity(mAnswerDao.createAnswer(pAnswer))
 						.build();
 			} // if
 
-			pAnswer.setQuestion(mQuestionDao.getQuestionById(pQuestionId));
-			return Response.ok().entity(mAnswerDao.createAnswer(pAnswer))
+			return Response
+					.status(Response.Status.FORBIDDEN)
+					.entity("{\"status\":\"forbidden\", \"message\":\"user does not have the previliege to perform the particular action\"}")
 					.build();
 		} // try
 		catch (Exception pExeception) {
@@ -136,7 +169,7 @@ public class AnswerService {
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "Answer ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
-	public Response deleteAnswer(@PathParam("sessionId") String pSessionId,
+	public Response deleteAnswer(@PathParam("qasessionId") String pQASessionId,
 			@PathParam("questionId") String pQuestionId,
 			@PathParam("answerId") String pAnswerId,
 			@Context HttpServletRequest pHttpServletRequest) {
@@ -144,19 +177,20 @@ public class AnswerService {
 
 			UserInfo lUserInfo = (UserInfo) pHttpServletRequest.getSession()
 					.getAttribute(FacebookClient.getUserInfoSessionId());
-			Attendee lAttendee = mAttendeeDao.getAttendeeBySessionIdUserId(
-					pSessionId, lUserInfo.getUserId());
-
-			if (lUserInfo.getUserRole().equals("ADMIN") || lAttendee == null
-					|| !lAttendee.getSessionRole().equals("HOST")) {
-				return Response
-						.status(Response.Status.FORBIDDEN)
-						.entity("{\"status\":\"forbidden\", \"message\":\"user does not have the previliege to perform the particular action\"}")
-						.build();
+			Attendee lAttendee = mAttendeeDao.getAttendeeByQASessionIdUserId(
+					pQASessionId, lUserInfo.getUserId());
+            QASession lQASession = mQASessionDao.getQASessionById(pQASessionId);
+			if (lUserInfo.getUserRole().equals("ADMIN") || 
+					(lAttendee != null && lQASession.getQASessionStatus().equals("OPEN") && lAttendee.getQASessionRole().equals("HOST"))) {
+				mAnswerDao.deleteAnswerById(pQuestionId);
+				return Response.ok().entity("{\"status\":\"success\"}").build();
 			} // if
 
-			mAnswerDao.deleteAnswerById(pQuestionId);
-			return Response.ok().entity("{\"status\":\"success\"}").build();
+			return Response
+					.status(Response.Status.FORBIDDEN)
+					.entity("{\"status\":\"forbidden\", \"message\":\"user does not have the previliege to perform the particular action\"}")
+					.build();
+			
 		} // try
 		catch (Exception pExeception) {
 			LOGGER.error(pExeception.toString());

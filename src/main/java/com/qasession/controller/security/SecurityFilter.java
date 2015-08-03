@@ -79,7 +79,7 @@ public class SecurityFilter implements Filter {
 				}  // try
 				catch(Exception pException)
 				{
-					LOGGER.error(pException.toString());
+					LOGGER.error("Error in validing the user token", pException);
 				}  // catch
 			}  //if
 		}  //if
@@ -106,7 +106,7 @@ public class SecurityFilter implements Filter {
 			}  // try
 			catch(Exception pException)
 			{
-				LOGGER.error(pException.toString());
+				LOGGER.error("Error in validing the user token", pException);
 			}  // catch
 			
 		}  // if
@@ -127,7 +127,7 @@ public class SecurityFilter implements Filter {
 			}  // try
 			catch(Exception pException)
 			{
-				LOGGER.error(pException.toString());
+				LOGGER.error("Error in validing the user token", pException);
 			}  // catch
 			
 		}  // if
@@ -170,11 +170,8 @@ public class SecurityFilter implements Filter {
 		ObjectMapper lMapper = new ObjectMapper();
 		JsonNode lNode = lMapper.readTree(lAuthResponse);
 		
-		pUserInfo.setFacebookProfileId(lNode.get("id").asText());
-		pUserInfo.setFacebookProfileLink(lNode.get("link").asText());
-		pUserInfo.setFirstName(lNode.get("first_name").asText());
-		pUserInfo.setLastName(lNode.get("last_name").asText());
-		pUserInfo.setEmail(lNode.get("email").asText());
+		pUserInfo.setFacebookId(lNode.get("id").asText());
+		pUserInfo.setName(lNode.get("name").asText());
 		if(FacebookClient.isAppAdminOauthIdentityID(pUserInfo.getFacebookProfileId()))
 		{
 			pUserInfo.setUserRole("ADMIN");

@@ -7,7 +7,7 @@
         <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
         <class>com.qasession.controller.model.Answer</class>
         <class>com.qasession.controller.model.Attendee</class>
-        <class>com.qasession.controller.model.Session</class>
+        <class>com.qasession.controller.model.QASession</class>
         <class>com.qasession.controller.model.Question</class>
         <class>com.qasession.controller.model.UserTranslate</class>
         <properties>

@@ -69,15 +69,15 @@ public class SpringUserTranslateDao implements UserTranslateDao
 		UserTranslate newUserTranslate = new UserTranslate();
 
 		newUserTranslate.setUserId(RandomStringGenerator.generator(RandomStringGenerator.ID_LENTH));
-		newUserTranslate.setFbUserId(pUserTranslate.getFbUserId());
-		newUserTranslate.setFirstName(pUserTranslate.getFirstName());
-		newUserTranslate.setLastName(pUserTranslate.getLastName());
+		newUserTranslate.setFacebookUserId(pUserTranslate.getFacebookUserId());
+		newUserTranslate.setName(pUserTranslate.getName());
+		newUserTranslate.setLoginUserIdType(pUserTranslate.getLoginUserIdType());
 		
-		mEntityManager.createNativeQuery("INSERT INTO USERTRANSLATE (USER_ID,FB_USER_ID,FIRST_NAME,LAST_NAME) VALUES (?, ?, ?, ?)")
+		mEntityManager.createNativeQuery("INSERT INTO usertranslate (user_id,facebook_user_id,name, login_user_id_type) VALUES (?, ?, ?, ?)")
 		.setParameter(1, newUserTranslate.getUserId())
-		.setParameter(2, newUserTranslate.getFbUserId())
-		.setParameter(3, newUserTranslate.getFirstName())
-		.setParameter(4, newUserTranslate.getLastName())
+		.setParameter(2, newUserTranslate.getFacebookUserId())
+		.setParameter(3, newUserTranslate.getName())
+		.setParameter(4, newUserTranslate.getLoginUserIdType())
 		.executeUpdate();
 		
 		return newUserTranslate;
@@ -92,13 +92,57 @@ public class SpringUserTranslateDao implements UserTranslateDao
 	public UserTranslate updateUserTranslate(UserTranslate pUserTranslate)
 			throws Exception {
 		UserTranslate oldUserTranslate = getUserTranslateById(pUserTranslate.getUserId());
-		oldUserTranslate.setFbUserId(pUserTranslate.getFbUserId());
-		oldUserTranslate.setFirstName(pUserTranslate.getFirstName());
-		oldUserTranslate.setLastName(pUserTranslate.getLastName());
+		oldUserTranslate.setFacebookUserId(pUserTranslate.getFacebookUserId());
+		oldUserTranslate.setName(pUserTranslate.getName());
+		oldUserTranslate.setLoginUserIdType(pUserTranslate.getLoginUserIdType());
 		
 		mEntityManager.persist(oldUserTranslate);
 		
 		return oldUserTranslate;
 	}
 
+	public List <UserTranslate> getUserTranslatesByLoginUserIdTypeLoginUserType(String pLoginUserId, String pLoginUserType)
+	{
+
+		String lLoginSearchIDField = null;
+		
+		if (pLoginUserType.equalsIgnoreCase("FACEBOOK"))
+		{
+			lLoginSearchIDField = "facebookUserId";
+		}
+		else if(pLoginUserType.equalsIgnoreCase("TWITTER"))
+		{
+			lLoginSearchIDField = "twitterUserId";
+		}
+			else if(pLoginUserType.equalsIgnoreCase("GOOGLE"))
+		{
+				lLoginSearchIDField = "googleUserId";
+		}
+		
+		// Create query to find info
+		String lBasedQuery = "SELECT user_translate_object FROM UserTranslate user_translate_object WHERE user_translate_object." + lLoginSearchIDField + " LIKE :pLoginUserId";
+		
+		Query lQuery = mEntityManager.createQuery(lBasedQuery);
+		lQuery = lQuery.setParameter("pLoginUserId", pLoginUserId);
+
+		List<?> lQueryList = lQuery.getResultList();
+		
+		// Create new list to store account
+		List<UserTranslate> lLists = new ArrayList<UserTranslate>(0);
+
+		// Check items in list and cast to account only if it is an instance
+		// of
+		// account object
+		// Throw exception if there is an cast error
+		for (Object lObject : lQueryList) {
+			if (lObject instanceof UserTranslate) {
+				lLists.add((UserTranslate) lObject);
+			} // if
+			else {
+				throw new ClassCastException();
+			} // else
+		} // for
+
+		return lLists;
+	}  // List <UserTranslate> getUserTranslatesByLoginUserIdTypeLoginUserType
 }

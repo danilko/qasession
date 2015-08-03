@@ -13,7 +13,7 @@ var NANESPACE_QA_SESSION = {
 						$
 								.ajax({
 									type : 'GET',
-									url : 'rest/attendee/' + data.uid,
+									url : 'rest/qasession/',
 									contentType : 'application/json',
 									dataType : 'json',
 									success : function(data) {
@@ -21,32 +21,30 @@ var NANESPACE_QA_SESSION = {
 										$
 												.each(
 														data,
-														function(i, attendee) {
+														function(i, qasession) {
 
 															$("#tbodySession")
 																	.append(
 																			"<tr id = \"tbtrSession_"
-																					+ attendee.session.sessionId
+																					+ qasession.qasessionId
 																					+ "\"><td>"
-																					+ attendee.session.sessionId
+																					+ qasession.qasessionId
 																							.substring(
 																									0,
 																									10)
 																					+ "</td><td>"
-																					+ attendee.session.sessionTopic
+																					+ qasession.qasessionTopic
 																							.substring(
 																									0,
 																									30)
 																					+ "</td><td>"
-																					+ attendee.session.sessionStatus
+																					+ qasession.qasessionStatus
 																					+ "</td><td>"
-																					+ attendee.sessionRole
-																					+ "</td><td>"
-																					+ attendee.session.updateDate
+																					+ qasession.updateDate
 																					+ "</td><td><a href=\"#\" onClick=\"NANESPACE_QA_SESSION.showSessionDetail('"
-																					+ attendee.session.sessionId
+																					+ qasession.qasessionId
 																					+ "')\"><span class=\"glyphicon glyphicon-th-list\"></span></a>  <a href=\"#\" onClick=\"NANESPACE_QA_SESSION.deleteSessionConfirm('"
-																					+ attendee.session.sessionId
+																					+ qasession.qasessionId
 																					+ "')\"><span class=\"glyphicon glyphicon-trash\"></span></a></td></tr>");
 														});
 										$("#divSessionList").show();
@@ -63,7 +61,7 @@ var NANESPACE_QA_SESSION = {
 					}
 				});
 	},
-	showSessionDetail : function(sessionId) {
+	showSessionDetail : function(qasessionId) {
 
 		$("#divSessionDetail").hide();
 		$("#divSessionList").hide();
@@ -71,27 +69,27 @@ var NANESPACE_QA_SESSION = {
 		$
 				.ajax({
 					type : 'GET',
-					url : 'rest/session/' + sessionId,
+					url : 'rest/qasession/' + qasessionId,
 					contentType : 'application/json',
 					dataType : 'json',
 					success : function(data) {
-						$("#existSessionSessionTopic").val(data.sessionTopic);
+						$("#existSessionSessionTopic").val(data.qasessionTopic);
 						$("#existSessionSessionDescription").val(
-								data.sessionDescription);
+								data.qasessionDescription);
 						$("#existSessionSessionMaxQuestion").val(
-								data.sessionMaxQuestion);
+								data.qasessionMaxQuestion);
 						$("#existSessionSessionStatus option:selected").text(
-								data.sessionStatus);
+								data.qasessionStatus);
 
 						$("#buttonExistSessionSaveExistSession").attr(
 								"onClick",
 								"NANESPACE_QA_SESSION.saveExistSession('"
-										+ data.sessionId + "');")
+										+ data.qasessionId + "');")
 
 						$("#buttonSessionCreateQuestion").attr(
 								"onClick",
 								"NANESPACE_QA_SESSION.createQuestion('"
-										+ data.sessionId + "');")
+										+ data.qasessionId + "');")
 						$("#sessionQuestionContent").val("");				
 										
 						if (data.questions.length > 0) {
@@ -108,12 +106,16 @@ var NANESPACE_QA_SESSION = {
 																		//+ "<span class=\"label label-info\">Created By " + question.createdBy.userTranslate.firstName + " " + question.createdBy.userTranslate.lastName + "</span>"
 																		+ "<p>"
 																		+ question.questionContent
-																		+ "</p><p class=\"text-right\"><a href=\"#\" onClick=\"NANESPACE_QA_SESSION.editQuestion('"
-																		+ question.session.sessionId
+																		+ "</p><p class=\"text-right\"> <a href=\"#\" onClick=\"NANESPACE_QA_SESSION.createAnswer('"
+																		+ question.qasessionId
 																		+ "', '"
 																		+ question.questionId
-																		+ "');\"><span class=\"glyphicon glyphicon-th-list\"> <a href=\"#\" onClick=\"NANESPACE_QA_SESSION.deleteQuestion('"
-																		+ question.session.sessionId
+																		+ "');\"><span class=\"glyphicon glyphicon-console\"></a>  <a href=\"#\" onClick=\"NANESPACE_QA_SESSION.editQuestion('"
+																		+ question.qasessionId
+																		+ "', '"
+																		+ question.questionId
+																		+ "');\"><span class=\"glyphicon glyphicon-th-list\">  <a href=\"#\" onClick=\"NANESPACE_QA_SESSION.deleteQuestion('"
+																		+ question.qasessionId
 																		+ "', '"
 																		+ question.questionId
 																		+ "');\"><span class=\"glyphicon glyphicon-trash\"></span></a></p></div>");
@@ -121,7 +123,7 @@ var NANESPACE_QA_SESSION = {
 													$(
 															"#divSessionDetailQuestions")
 															.append(
-																	"<blockquote><span class=\"label label-success\">Answer</span> <span class=\"label label-info\">Created By " + question.answer.createdBy.userTranslate.firstName + " " + question.answer.createdBy.userTranslate.lastName + "</span><p> "
+																	"<blockquote><span class=\"label label-success\">Answer</span> <span class=\"label label-info\">Created By " + question.answer.createdBy + "</span><p> "
 																			+ question.answer.answerContent
 																			+ " </p></blockquote>");
 												} // if
@@ -149,7 +151,7 @@ var NANESPACE_QA_SESSION = {
 			success : function(data) {
 
 				$("#span_user_name").html(
-						" " + data.firstName + " " + data.lastName);
+						" " + data.name);
 				// NANESPACE_QA_SESSION.storeCookie('QA_SESSION_UI_COOKIE' ,
 				// data);
 			}, // success
@@ -175,40 +177,40 @@ var NANESPACE_QA_SESSION = {
 	},
 	createSession : function() {
 
-		var sessionObject = new Object();
+		var qasessionObject = new Object();
 
-		sessionObject.sessionTopic = $("#sessionTopic").val();
-		sessionObject.sessionDescription = $("#sessionDescription").val();
-		sessionObject.sessionMaxQuestion = $("#sessionMaxQuestion").val();
-		sessionObject.sessionStatus = $("#sessionStatus option:selected")
+		qasessionObject.qasessionTopic = $("#sessionTopic").val();
+		qasessionObject.qasessionDescription = $("#sessionDescription").val();
+		qasessionObject.qasessionMaxQuestion = $("#sessionMaxQuestion").val();
+		qasessionObject.qasessionStatus = $("#sessionStatus option:selected")
 				.text();
 
 		$
 				.ajax({
 					type : 'POST',
-					url : 'rest/session',
+					url : 'rest/qasession',
 					contentType : 'application/json',
 					dataType : 'json',
-					data : JSON.stringify(sessionObject),
+					data : JSON.stringify(qasessionObject),
 					success : function(data) {
 						$("#tbodySession")
 								.append(
 										"<tr id = \"tbtrSession_"
-												+ data.sessionId
+												+ data.qasessionId
 												+ "\"><td>"
-												+ data.sessionId.substring(0,
+												+ data.qasessionId.substring(0,
 														10)
 												+ "</td><td>"
-												+ data.sessionTopic.substring(
+												+ data.qasessionTopic.substring(
 														0, 30)
 												+ "</td><td>"
-												+ data.sessionStatus
+												+ data.qasessionStatus
 												+ "</td><td>HOST</td><td>"
-												+ data.updateDate
+												+ data.update_timestamp
 												+ "</td><td><a href=\"#\" onClick=\"NANESPACE_QA_SESSION.showSessionDetail('"
-												+ data.sessionId
+												+ data.qasessionId
 												+ "')\"><span class=\"glyphicon glyphicon-th-list\"></span></a> <a href=\"#\" onClick=\"NANESPACE_QA_SESSION.deleteSessionConfirm('"
-												+ data.sessionId
+												+ data.qasessionId
 												+ "')\"><span class=\"glyphicon glyphicon-trash\"></span></a></td></tr>");
 						$('#modalNewSession').modal('hide');
 
@@ -239,20 +241,20 @@ var NANESPACE_QA_SESSION = {
 								+ "</div>");
 
 	}, // addSessionAlert : function(alertType, alertMessage)
-	saveExistSession : function(sessionId) {
+	saveExistSession : function(qasessionId) {
 		var sessionObject = new Object();
-		sessionObject.sessionTopic = $("#existSessionSessionTopic").val();
-		sessionObject.sessionDescription = $("#existSessionSessionDescription")
+		sessionObject.qasessionTopic = $("#existSessionSessionTopic").val();
+		sessionObject.qasessionDescription = $("#existSessionSessionDescription")
 				.val();
-		sessionObject.sessionMaxQuestion = $("#existSessionSessionMaxQuestion")
+		sessionObject.qasessionMaxQuestion = $("#existSessionSessionMaxQuestion")
 				.val();
-		sessionObject.sessionStatus = $(
+		sessionObject.qasessionStatus = $(
 				"#existSessionSessionStatus option:selected").text();
 
 		$
 				.ajax({
 					type : 'PUT',
-					url : 'rest/session/' + sessionId,
+					url : 'rest/qasession/' + qasessionId,
 					contentType : 'application/json',
 					dataType : 'json',
 					data : JSON.stringify(sessionObject),
@@ -269,25 +271,25 @@ var NANESPACE_QA_SESSION = {
 					}
 				});
 	}, // saveExistSession
-	deleteSessionConfirm : function(sessionId) {
+	deleteSessionConfirm : function(qasessionId) {
 		$('#modalConfirmDialogLabel').html("Delete Session");
 		$('#modalConfirmDialogBody')
 				.html(
 						"Are you sure you want to delete the session entry? All session info, questions and answers will be lost.");
 		$('#modalConfirmDialogButtonConfirm').attr("onClick",
-				"NANESPACE_QA_SESSION.deleteSession('" + sessionId + "');");
+				"NANESPACE_QA_SESSION.deleteSession('" + qasessionId + "');");
 		$('#modalConfirmDialog').modal('show');
 	},
-	deleteSession : function(sessionId) {
+	deleteSession : function(qasessionId) {
 
 		$
 				.ajax({
 					type : 'DELETE',
-					url : 'rest/session/' + sessionId,
+					url : 'rest/qasession/' + qasessionId,
 					contentType : 'application/json',
 					dataType : 'json',
 					success : function(data) {
-						$("#tbtrSession_" + sessionId).remove();
+						$("#tbtrSession_" + qasessionId).remove();
 
 						NANESPACE_QA_SESSION.addSessionAlert("SUCCESS",
 								"The session is removed now.");
@@ -302,7 +304,7 @@ var NANESPACE_QA_SESSION = {
 					}
 				});
 	}, // deleteSession : function()
-	createQuestion : function(sessionId) {
+	createQuestion : function(qasessionId) {
 		var questionObject = new Object();
 		questionObject.questionStatus = "OPEN";
 		questionObject.questionContent = $("#sessionQuestionContent").val();
@@ -310,13 +312,13 @@ var NANESPACE_QA_SESSION = {
 		$
 				.ajax({
 					type : 'POST',
-					url : 'rest/session/' + sessionId + "/question",
+					url : 'rest/qasession/' + qasessionId + "/question",
 					contentType : 'application/json',
 					data : JSON.stringify(questionObject),
 					dataType : 'json',
 					success : function(data) {
 
-						NANESPACE_QA_SESSION.showSessionDetail(data.session.sessionId);
+						NANESPACE_QA_SESSION.showSessionDetail(data.qasessionId);
 						NANESPACE_QA_SESSION.addSessionAlert("SUCCESS",
 								"The question is added now.");
 
@@ -335,13 +337,46 @@ var NANESPACE_QA_SESSION = {
 						.addSessionAlert("FAILURE", alertMessage);
 					}
 				});
-	}, // deleteSession : function()
-	deleteQuestion : function(sessionId, questionId) {
+	}, // createQuestion : function()
+	createAnswer : function(qasessionId, questionId) {
+		var answerObject = new Object();
+		answerObject.answerContent = $("#sessionQuestionAnswerContent").val();
+
+		$
+				.ajax({
+					type : 'POST',
+					url : 'rest/qasession/' + qasessionId + "/question/" + questionId,
+					contentType : 'application/json',
+					data : JSON.stringify(answerObject),
+					dataType : 'json',
+					success : function(data) {
+
+						NANESPACE_QA_SESSION.showSessionDetail(data.qasessionId);
+						NANESPACE_QA_SESSION.addSessionAlert("SUCCESS",
+								"The answer is added now.");
+
+					}, // success
+					error : function(jqXHR, textStatus, errorThrown) {
+						alertMessage = "";
+						if (jqXHR.status == 403)
+						{
+							alertMessage = "This operation is not allowed"
+						}  // if
+						else
+						{
+							alertMessage = "There is something wrong with backend, please try again later."
+						}  // else
+						NANESPACE_QA_SESSION
+						.addSessionAlert("FAILURE", alertMessage);
+					}
+				});
+	}, // createQuestion : function()
+	deleteQuestion : function(qasessionId, questionId) {
 
 		$
 				.ajax({
 					type : 'DELETE',
-					url : 'rest/session/' + sessionId + "/question/"
+					url : 'rest/qasession/' + qasessionId + "/question/"
 							+ questionId,
 					contentType : 'application/json',
 					dataType : 'json',
@@ -367,7 +402,7 @@ var NANESPACE_QA_SESSION = {
 					}
 				});
 	}, // deleteSession : function()
-	displayAllSession : function(sessionId) {
+	displayAllSession : function(qasessionId) {
 	}, // displayAllSession
 	logotUser : function() {
 		$
