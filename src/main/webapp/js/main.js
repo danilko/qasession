@@ -118,7 +118,7 @@ var NANESPACE_QA_SESSION = {
 																		+ question.qasessionId
 																		+ "', '"
 																		+ question.questionId
-																		+ "');\"><span class=\"glyphicon glyphicon-trash\"></span></a></p></div>");
+																		+ "');\"><span class=\"glyphicon glyphicon-trash\"></span></a></p><br/><p class=\"text-right\"> + Last Update on + " + question.update_timestamp + " By " + question.updatedBy + "</p></div>");
 												if (question.answer != null) {
 													$(
 															"#divSessionDetailQuestions")
