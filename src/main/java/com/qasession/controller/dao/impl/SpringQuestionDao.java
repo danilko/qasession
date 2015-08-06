@@ -3,6 +3,7 @@ package com.qasession.controller.dao.impl;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -110,9 +111,9 @@ public class SpringQuestionDao implements QuestionDao {
 				.setParameter(5,
 						pQuestion.getUpdatedBy())
 				.setParameter(6, pQuestion.getQuestionStatus())
-				.setParameter(7, Calendar.getInstance(),
+				.setParameter(7, Calendar.getInstance(TimeZone.getTimeZone("UTC")),
 						TemporalType.TIMESTAMP)
-				.setParameter(8, Calendar.getInstance(),
+				.setParameter(8, Calendar.getInstance(TimeZone.getTimeZone("UTC")),
 						TemporalType.TIMESTAMP)
 						.executeUpdate();
 
@@ -122,14 +123,10 @@ public class SpringQuestionDao implements QuestionDao {
 	@Transactional(rollbackFor = Throwable.class)
 	public void deleteQuestionById(String pQuestionId) {
 		mEntityManager
-				.createQuery(
-						"DELETE FROM Answer answer_object WHERE answer_object.questionId = :questionId")
-				.setParameter("questionId", pQuestionId).executeUpdate();
+				.createNativeQuery(
+						"DELETE FROM question WHERE question_id = ?")
+				.setParameter(1, pQuestionId).executeUpdate();
 		mEntityManager.flush();
-		mEntityManager
-				.createQuery(
-						"DELETE FROM Question question_object WHERE question_object.questionId = :questionId")
-				.setParameter("questionId", pQuestionId).executeUpdate();
 	} // void deleteQuestionById
 
 	@Transactional(rollbackFor = Throwable.class)
@@ -143,7 +140,7 @@ public class SpringQuestionDao implements QuestionDao {
 		oldQuestion.setUpdatedBy(pQuestion.getUpdatedBy());
 		oldQuestion.setCreatedBy(pQuestion.getCreatedBy());
 		
-		oldQuestion.setUpdateTimestamp(Calendar.getInstance());
+		oldQuestion.setUpdateTimestamp(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
 
 		mEntityManager.persist(oldQuestion);
 

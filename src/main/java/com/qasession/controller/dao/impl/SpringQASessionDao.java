@@ -3,6 +3,7 @@ package com.qasession.controller.dao.impl;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -77,9 +78,9 @@ public class SpringQASessionDao implements QASessionDao {
 				.setParameter(3, pQASession.getQASessionDescription())
 				.setParameter(4, pQASession.getQASessionStatus())
 				.setParameter(5, pQASession.getQASessionMaxQuestion())
-				.setParameter(6, Calendar.getInstance(),
+				.setParameter(6, Calendar.getInstance(TimeZone.getTimeZone("UTC")),
 						TemporalType.TIMESTAMP)
-		        .setParameter(7, Calendar.getInstance(),
+		        .setParameter(7, Calendar.getInstance(TimeZone.getTimeZone("UTC")),
 				        TemporalType.TIMESTAMP)
 				.setParameter(8, pQASession.getCreatedBy())
 				.setParameter(9, pQASession.getUpdatedBy())
@@ -90,25 +91,11 @@ public class SpringQASessionDao implements QASessionDao {
 
 	@Transactional(readOnly = false, rollbackFor = Throwable.class)
 	public void deleteQASessionById(String pQASessionId) {
+
 		mEntityManager
-				.createQuery(
-						"DELETE FROM Answer answer_object WHERE answer_object.question.qasessionId = :qasessionId")
-				.setParameter("qasessionId", pQASessionId).executeUpdate();
+				.createNativeQuery("DELETE FROM qasession WHERE qasession_id = ?")
+				.setParameter(1, pQASessionId).executeUpdate();
 		mEntityManager.flush();
-		mEntityManager
-				.createQuery(
-						"DELETE FROM Question question_object WHERE question_object.qasessionId = :qasessionId")
-				.setParameter("qasessionId", pQASessionId).executeUpdate();
-		mEntityManager.flush();
-		mEntityManager
-				.createQuery(
-						"DELETE FROM Attendee attendee_object WHERE attendee_object.qasessionId = :qasessionId")
-				.setParameter("qasessionId", pQASessionId).executeUpdate();
-		mEntityManager.flush();
-		mEntityManager
-				.createQuery(
-						"DELETE FROM QASession qasession_object WHERE qasession_object.qasessionId = :qasessionId")
-				.setParameter("qasessionId", pQASessionId).executeUpdate();
 	} // deleteSessionById
 
 	@Transactional(readOnly = false, rollbackFor = Throwable.class)
@@ -119,7 +106,7 @@ public class SpringQASessionDao implements QASessionDao {
 		oldQASession.setQASessionTopic(pQASession.getQASessionTopic());
 
 		oldQASession.setCreatedBy(oldQASession.getCreatedBy());
-		oldQASession.setUpdateTimestamp(Calendar.getInstance());
+		oldQASession.setUpdateTimestamp(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
 
 		oldQASession.setQASessionStatus(pQASession.getQASessionStatus());
 		oldQASession.setQASessionMaxQuestion(pQASession.getQASessionMaxQuestion());

@@ -3,6 +3,7 @@ package com.qasession.controller.dao.impl;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -73,9 +74,9 @@ public class SpringAttendeeDao implements AttendeeDao {
 				.setParameter(3,
 						pAttendee.getUserId())
 				.setParameter(4, pAttendee.getQASessionRole())
-				.setParameter(5, Calendar.getInstance(),
+				.setParameter(5, Calendar.getInstance(TimeZone.getTimeZone("UTC")),
 						TemporalType.TIMESTAMP)
-				.setParameter(6, Calendar.getInstance(),
+				.setParameter(6, Calendar.getInstance(TimeZone.getTimeZone("UTC")),
 						TemporalType.TIMESTAMP)
 						.executeUpdate();
 
@@ -136,10 +137,11 @@ public class SpringAttendeeDao implements AttendeeDao {
 	public void deleteAttendeeByQASessionIdUserId(String pQASessionId,
 			String pUserId) throws Exception {
 		mEntityManager
-				.createQuery(
-						"DELETE FROM Attendee attendee_object WHERE attendee_object.userId = :userId AND attendee_object.qasessionId = :qasessionId")
-				.setParameter("qasessionId", pUserId)
-				.setParameter("userId", pUserId)
+				.createNativeQuery(
+						"DELETE FROM attendee WHERE user_id = ? AND qasession_id = ?")
+				.setParameter(1, pUserId)
+				.setParameter(2, pQASessionId)
 				.executeUpdate();
+		mEntityManager.flush();
 	} // void deleteAttendeeBySessionIdUserId
 } // SpringAttendeeDao

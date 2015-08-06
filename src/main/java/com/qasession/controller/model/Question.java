@@ -14,6 +14,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -48,11 +49,12 @@ public class Question implements Serializable
 	@Column(name = "question_status") 
 	private String questionStatus;
 	
-    
+	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd,HH:00", timezone="UTC")
 	@Column(name = "create_timestamp", nullable = false)  
 	@Temporal(TemporalType.TIMESTAMP) 
     private Calendar createTimestamp;
 	
+	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd,HH:00", timezone="UTC")
 	@Column(name = "update_timestamp", nullable = false)  
 	@Temporal(TemporalType.TIMESTAMP) 
     private Calendar updateTimestamp;

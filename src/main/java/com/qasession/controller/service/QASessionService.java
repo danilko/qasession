@@ -151,9 +151,14 @@ public class QASessionService {
 					pQASessionId, lUserInfo.getUserId());
 
 		    QASession lQASession = mQASessionDao.getQASessionById(pQASessionId);
-			
+		    
+		    if (lQASession == null) {
+		    	return Response.status(Response.Status.NOT_FOUND).build();
+			}
+		    
 			if (lUserInfo.getUserRole().equals("ADMIN") || 
 					(lAttendee != null && lAttendee.getQASessionRole().equals("HOST"))) {
+				
 				lQASession.setAttendees(pQASession.getAttendees());
 				lQASession.setUpdatedBy(lUserInfo.getUserId());
 				lQASession.setQASessionDescription(pQASession.getQASessionDescription());
@@ -161,7 +166,7 @@ public class QASessionService {
 				lQASession.setQASessionStatus(pQASession.getQASessionStatus());
 				lQASession.setQASessionTopic(pQASession.getQASessionTopic());
 				
-				return Response.ok().entity(mQASessionDao.updateQASession(pQASession))
+				return Response.ok().entity(mQASessionDao.updateQASession(lQASession))
 						.build();
 			} // if
 			

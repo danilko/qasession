@@ -145,4 +145,39 @@ public class SpringUserTranslateDao implements UserTranslateDao
 
 		return lLists;
 	}  // List <UserTranslate> getUserTranslatesByLoginUserIdTypeLoginUserType
+
+	public List<UserTranslate> getAllUserTranslate() {
+
+		// Create query to find info
+		String lBasedQuery = "SELECT user_translate_object FROM UserTranslate user_translate_object";
+		
+		Query lQuery = mEntityManager.createQuery(lBasedQuery);
+
+		List<?> lQueryList = lQuery.getResultList();
+		
+		// Create new list to store account
+		List<UserTranslate> lLists = new ArrayList<UserTranslate>(0);
+
+		// Check items in list and cast to account only if it is an instance
+		// of
+		// account object
+		// Throw exception if there is an cast error
+		for (Object lObject : lQueryList) {
+			if (lObject instanceof UserTranslate) {
+				UserTranslate lTempUserTranslate  = (UserTranslate) lObject;
+				
+				lTempUserTranslate.setFacebookUserId("");
+				lTempUserTranslate.setGoogleUserId("");
+				lTempUserTranslate.setTwitterUserId("");
+				lTempUserTranslate.setLoginUserIdType("");
+				
+				lLists.add((UserTranslate) lObject);
+			} // if
+			else {
+				throw new ClassCastException();
+			} // else
+		} // for
+
+		return lLists;
+	}
 }

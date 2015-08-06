@@ -73,10 +73,27 @@ public class UserService {
 					.entity(lUserInfo).build();
 		} // try
 		catch (Exception pExeception) {
-			LOGGER.error(pExeception.toString());
+			LOGGER.error("Error performing the request", pExeception);
 			return Response.serverError().build();
 		} // catch
 	} // Session getAllAttendeeOccurance
+	
+	@Path("/_all")
+	@GET
+	@ApiOperation(value = "Get current token info", notes = "Return user info for this user")
+	@ApiResponses(value = { @ApiResponse(code = 404, message = "Attendee ID not found"), @ApiResponse(code = 403, message = "Not authorized") })
+	public Response getAllUserTranslate()
+	{
+		try{
+			return Response
+					.ok()
+					.entity(mUserTranslateDao.getAllUserTranslate()).build();
+	} // try
+	catch (Exception pExeception) {
+		LOGGER.error("Error performing the request", pExeception);
+		return Response.serverError().build();
+	} // catch
+	}
 	
 	@Path("/token")
 	@GET

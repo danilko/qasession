@@ -3,6 +3,7 @@ package com.qasession.controller.dao.impl;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -65,9 +66,9 @@ public class SpringAnswerDao implements AnswerDao {
 				.setParameter(3, pAnswer.getQuestionId())
 				.setParameter(4, pAnswer.getCreatedBy())
 				.setParameter(5, pAnswer.getUpdatedBy())
-				.setParameter(6, Calendar.getInstance(),
+				.setParameter(6, Calendar.getInstance(TimeZone.getTimeZone("UTC")),
 						TemporalType.TIMESTAMP)
-				.setParameter(7, Calendar.getInstance(),
+				.setParameter(7, Calendar.getInstance(TimeZone.getTimeZone("UTC")),
 						TemporalType.TIMESTAMP).executeUpdate();
 
 		return getAnswerById(pAnswer.getAnswerId());
@@ -76,9 +77,10 @@ public class SpringAnswerDao implements AnswerDao {
 	@Transactional(rollbackFor = Throwable.class)
 	public void deleteAnswerById(String pAnswerId) throws Exception {
 		mEntityManager
-				.createQuery(
-						"DELETE FROM Answer answer_object WHERE answer_object.answerId = :answerId")
-				.setParameter("answerId", pAnswerId).executeUpdate();
+				.createNativeQuery(
+						"DELETE FROM answer WHERE answer_id = ?")
+				.setParameter(1, pAnswerId).executeUpdate();
+		mEntityManager.flush();
 	} // void deleteAnswerById
 
 	@Transactional(rollbackFor = Throwable.class)
@@ -87,7 +89,7 @@ public class SpringAnswerDao implements AnswerDao {
 		oldAnswer.setCreatedBy(pAnswer.getCreatedBy());
 		oldAnswer.setUpdatedBy(pAnswer.getUpdatedBy());
 		oldAnswer.setAnswerContent(pAnswer.getAnswerContent());
-		oldAnswer.setUpdateTimestamp(Calendar.getInstance());
+		oldAnswer.setUpdateTimestamp(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
 
 		mEntityManager.persist(oldAnswer);
 
