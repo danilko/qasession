@@ -1,3 +1,40 @@
+/**
+ * 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) Kai-Ting (Danil) Ko
+ * 
+ * Permission is hereby granted, free of charge, 
+ * to any person obtaining a copy of this software 
+ * and associated documentation files (the "Software"), 
+ * to deal in the Software without restriction, including 
+ * without limitation the rights to use, copy, modify, 
+ * merge, publish, distribute, sublicense, and/or sell 
+ * copies of the Software, and to permit persons to whom 
+ * the Software is furnished to do so, subject to the 
+ * following conditions:
+ * 
+ * The above copyright notice and this permission notice 
+ * shall be included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY 
+ * OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED 
+ * TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS 
+ * OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
+ * USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * 
+ */
+
+/**
+ * 
+ * @author Kai - Ting (Danil) Ko
+ * @see QuestionDao
+ * SpringQuestionDao Service class
+ */
+
 package com.qasession.controller.dao.impl;
 
 import java.util.ArrayList;
@@ -21,37 +58,6 @@ import com.qasession.controller.utility.RandomStringGenerator;
 public class SpringQuestionDao implements QuestionDao {
 	@PersistenceContext(unitName = "getEntityManagerFactoryBean")
 	private EntityManager mEntityManager;
-
-	@Transactional(rollbackFor = Throwable.class)
-	public List<Question> getQuestionsByKeyValue(String pKeyName,
-			String pKeyValue) {
-		// Create query to find info
-		String lBasedQuery = "SELECT question_object FROM Question question_object WHERE question_object."
-				+ pKeyName + " LIKE :pKeyValue";
-
-		Query lQuery = mEntityManager.createQuery(lBasedQuery);
-		lQuery = lQuery.setParameter("pKeyValue", pKeyValue);
-
-		List<?> lQueryList = lQuery.getResultList();
-
-		// Create new list to store account
-		List<Question> lLists = new ArrayList<Question>(0);
-
-		// Check items in list and cast to account only if it is an instance
-		// of
-		// account object
-		// Throw exception if there is an cast error
-		for (Object lObject : lQueryList) {
-			if (lObject instanceof Question) {
-				lLists.add((Question) lObject);
-			} // if
-			else {
-				throw new ClassCastException();
-			} // else
-		} // for
-
-		return lLists;
-	}
 
 	public List<Question> getQuestionsBySessionIdUserId(String pSessionId,
 			String pUserId) {
@@ -85,10 +91,32 @@ public class SpringQuestionDao implements QuestionDao {
 
 	@Transactional(rollbackFor = Throwable.class)
 	public Question getQuestionById(String pQuestionId) {
-		List<Question> lList = getQuestionsByKeyValue("questionId", pQuestionId);
+		// Create query to find info
+		String lBasedQuery = "SELECT question_object FROM Question question_object WHERE question_object.questionId = :questionId";
 
-		if (lList.size() > 0) {
-			return lList.get(0);
+		Query lQuery = mEntityManager.createQuery(lBasedQuery);
+		lQuery = lQuery.setParameter("questionId", pQuestionId);
+
+		List<?> lQueryList = lQuery.getResultList();
+
+		// Create new list to store account
+		List<Question> lLists = new ArrayList<Question>(0);
+
+		// Check items in list and cast to account only if it is an instance
+		// of
+		// account object
+		// Throw exception if there is an cast error
+		for (Object lObject : lQueryList) {
+			if (lObject instanceof Question) {
+				lLists.add((Question) lObject);
+			} // if
+			else {
+				throw new ClassCastException();
+			} // else
+		} // for
+
+		if (lLists.size() > 0) {
+			return lLists.get(0);
 		} // if
 
 		return null;

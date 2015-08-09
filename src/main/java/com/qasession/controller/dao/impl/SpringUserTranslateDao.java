@@ -1,3 +1,40 @@
+/**
+ * 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) Kai-Ting (Danil) Ko
+ * 
+ * Permission is hereby granted, free of charge, 
+ * to any person obtaining a copy of this software 
+ * and associated documentation files (the "Software"), 
+ * to deal in the Software without restriction, including 
+ * without limitation the rights to use, copy, modify, 
+ * merge, publish, distribute, sublicense, and/or sell 
+ * copies of the Software, and to permit persons to whom 
+ * the Software is furnished to do so, subject to the 
+ * following conditions:
+ * 
+ * The above copyright notice and this permission notice 
+ * shall be included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY 
+ * OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED 
+ * TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS 
+ * OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
+ * USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * 
+ */
+
+/**
+ * 
+ * @author Kai - Ting (Danil) Ko
+ * @see UserTranslateDao
+ * SpringUserTranslateDo Service class
+ */
+
 package com.qasession.controller.dao.impl;
 
 import java.util.ArrayList;
@@ -25,15 +62,13 @@ public class SpringUserTranslateDao implements UserTranslateDao {
 	private EntityManager mEntityManager;
 
 	@Transactional(rollbackFor = Throwable.class)
-	public List<UserTranslate> getUserTranslatesByKeyValue(String pKeyName,
-			String pKeyValue) throws Exception {
+	public UserTranslate getUserTranslateByUserId(String pUserId) throws Exception {
 
 		// Create query to find info
-		String lBasedQuery = "SELECT user_translate_object FROM UserTranslate user_translate_object WHERE user_translate_object."
-				+ pKeyName + " LIKE :pKeyValue";
+		String lBasedQuery = "SELECT user_translate_object FROM UserTranslate user_translate_object WHERE user_translate_object.userId = :userId";
 
 		Query lQuery = mEntityManager.createQuery(lBasedQuery);
-		lQuery = lQuery.setParameter("pKeyValue", pKeyValue);
+		lQuery = lQuery.setParameter("userId", pUserId);
 
 		List<?> lQueryList = lQuery.getResultList();
 
@@ -53,20 +88,13 @@ public class SpringUserTranslateDao implements UserTranslateDao {
 			} // else
 		} // for
 
-		return lLists;
-	}
-
-	@Transactional(readOnly = true, rollbackFor = Throwable.class)
-	public UserTranslate getUserTranslateById(String pUserId) throws Exception {
-		List<UserTranslate> lList = getUserTranslatesByKeyValue("userId",
-				pUserId);
-
-		if (lList.size() > 0) {
-			return lList.get(0);
-		} // if
-
+		if (lLists.size() > 0)
+		{
+			return lLists.get(0);
+		}  // if
+		
 		return null;
-	}
+	}  // UserTranslate getUserTranslateByUserId
 
 	@Transactional(readOnly = false, rollbackFor = Throwable.class)
 	public UserTranslate createUserTranslate(UserTranslate pUserTranslate)
@@ -105,7 +133,7 @@ public class SpringUserTranslateDao implements UserTranslateDao {
 	@Transactional(readOnly = false, rollbackFor = Throwable.class)
 	public UserTranslate updateUserTranslate(UserTranslate pUserTranslate)
 			throws Exception {
-		UserTranslate oldUserTranslate = getUserTranslateById(pUserTranslate
+		UserTranslate oldUserTranslate = getUserTranslateByUserId(pUserTranslate
 				.getUserId());
 		oldUserTranslate.setFacebookUserId(pUserTranslate.getFacebookUserId());
 		oldUserTranslate.setGoogleUserId(pUserTranslate.getGoogleUserId());
@@ -114,8 +142,8 @@ public class SpringUserTranslateDao implements UserTranslateDao {
 		oldUserTranslate
 				.setLoginUserIdType(pUserTranslate.getLoginUserIdType());
 		oldUserTranslate.setUpdateTimestamp(Calendar.getInstance());
-
-		mEntityManager.flush();
+		
+		mEntityManager.persist(oldUserTranslate);
 
 		return oldUserTranslate;
 	}
@@ -126,20 +154,22 @@ public class SpringUserTranslateDao implements UserTranslateDao {
 
 		String lLoginSearchIDField = null;
 
-		if (pLoginUserType.equalsIgnoreCase("FACEBOOK")) {
+		if (pLoginUserType.equalsIgnoreCase(UserInfo.LOGIN_TYPE_FACEBOOK)) {
 			lLoginSearchIDField = "facebookUserId";
-		} else if (pLoginUserType.equalsIgnoreCase("TWITTER")) {
+		}  // if
+		else if (pLoginUserType.equalsIgnoreCase(UserInfo.LOGIN_TYPE_TWITTER)) {
 			lLoginSearchIDField = "twitterUserId";
-		} else if (pLoginUserType.equalsIgnoreCase("GOOGLE")) {
+		}  // else if
+		else if (pLoginUserType.equalsIgnoreCase(UserInfo.LOGIN_TYPE_GOOGLE)) {
 			lLoginSearchIDField = "googleUserId";
-		}
+		}  // else if
 
 		// Create query to find info
 		String lBasedQuery = "SELECT user_translate_object FROM UserTranslate user_translate_object WHERE user_translate_object."
-				+ lLoginSearchIDField + " LIKE :pLoginUserId";
+				+ lLoginSearchIDField + " = :loginUserId";
 
 		Query lQuery = mEntityManager.createQuery(lBasedQuery);
-		lQuery = lQuery.setParameter("pLoginUserId", pLoginUserId);
+		lQuery = lQuery.setParameter("loginUserId", pLoginUserId);
 
 		List<?> lQueryList = lQuery.getResultList();
 
@@ -182,13 +212,14 @@ public class SpringUserTranslateDao implements UserTranslateDao {
 		for (Object lObject : lQueryList) {
 			if (lObject instanceof UserTranslate) {
 				UserTranslate lTempUserTranslate = (UserTranslate) lObject;
+				UserTranslate lNewUserTranslate = new UserTranslate();
+				
+				lNewUserTranslate.setUserId(lTempUserTranslate.getUserId());
+				lNewUserTranslate.setName(lTempUserTranslate.getName());
+				lNewUserTranslate.setCreateTimestamp(lTempUserTranslate.getCreateTimestamp());
+				lNewUserTranslate.setUpdateTimestamp(lTempUserTranslate.getUpdateTimestamp());
 
-				lTempUserTranslate.setFacebookUserId("");
-				lTempUserTranslate.setGoogleUserId("");
-				lTempUserTranslate.setTwitterUserId("");
-				lTempUserTranslate.setLoginUserIdType("");
-
-				lLists.add((UserTranslate) lObject);
+				lLists.add(lNewUserTranslate);
 			} // if
 			else {
 				throw new ClassCastException();
@@ -209,7 +240,7 @@ public class SpringUserTranslateDao implements UserTranslateDao {
 			try {
 
 				List<UserTranslate> lList = getUserTranslatesByLoginUserIdTypeLoginUserType(
-						lUserInfo.getFacebookProfileId(), "FACEBOOK");
+						lUserInfo.getFacebookProfileId(), lUserInfo.getLoginType());
 
 				UserTranslate lUserTranslate = null;
 
@@ -221,7 +252,7 @@ public class SpringUserTranslateDao implements UserTranslateDao {
 					lUserTranslate = new UserTranslate();
 					lUserTranslate.setFacebookUserId(lUserInfo
 							.getFacebookProfileId());
-					lUserTranslate.setLoginUserIdType("FACEBOOK");
+					lUserTranslate.setLoginUserIdType(lUserInfo.getLoginType());
 					lUserTranslate.setName(lUserInfo.getName());
 
 					lUserTranslate = createUserTranslate(lUserTranslate);

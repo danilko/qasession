@@ -1,3 +1,39 @@
+/**
+ * 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) Kai-Ting (Danil) Ko
+ * 
+ * Permission is hereby granted, free of charge, 
+ * to any person obtaining a copy of this software 
+ * and associated documentation files (the "Software"), 
+ * to deal in the Software without restriction, including 
+ * without limitation the rights to use, copy, modify, 
+ * merge, publish, distribute, sublicense, and/or sell 
+ * copies of the Software, and to permit persons to whom 
+ * the Software is furnished to do so, subject to the 
+ * following conditions:
+ * 
+ * The above copyright notice and this permission notice 
+ * shall be included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY 
+ * OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED 
+ * TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS 
+ * OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
+ * USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * 
+ */
+
+/**
+ * 
+ * @author Kai - Ting (Danil) Ko
+ * QASession Service class
+ */
+
 package com.qasession.controller.service;
 
 import java.util.Calendar;
@@ -24,7 +60,6 @@ import com.qasession.controller.dao.QASessionDao;
 import com.qasession.controller.dao.UserTranslateDao;
 import com.qasession.controller.model.Attendee;
 import com.qasession.controller.model.QASession;
-import com.qasession.controller.model.UserTranslate;
 import com.qasession.controller.security.UserInfo;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;
@@ -47,7 +82,7 @@ public class QASessionService {
 
 	@GET
 	@Path("/")
-	@ApiOperation(value = "Get all qasessions belong to current", response = QASession.class, responseContainer = "List", notes = "Return the session record that this session belong")
+	@ApiOperation(value = "Get all qasessions belong to current user", response = QASession.class, responseContainer = "List", notes = "Return the session record that this session belong")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "List of qasessions belong to the user"),
 			@ApiResponse(code = 403, message = "Not authorized") })
@@ -75,7 +110,7 @@ public class QASessionService {
 	@GET
 	@Path("/{qasessionId}")
 	@ApiOperation(value = "Find session by session ID", response = QASession.class, notes = "Return the session record that this session belong")
-	@ApiResponses(value = { @ApiResponse(code = 200, message = "Session find"),
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Session find and return the session object"),
 			@ApiResponse(code = 404, message = "Session ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
 	public Response getSessionById(@PathParam("qasessionId") String pQASessionId) {
@@ -190,9 +225,9 @@ public class QASessionService {
 
 	@DELETE
 	@Path("/{qasessionId}")
-	@ApiOperation(value = "Delete a session by session id", notes = "Delete a session by session id")
+	@ApiOperation(value = "Delete a session by session ID", notes = "Delete a session by session id")
 	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Operation Success"),
+			@ApiResponse(code = 200, message = "Delete a session by session ID operation success"),
 			@ApiResponse(code = 404, message = "Session ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
 	public Response deleteSessionById(

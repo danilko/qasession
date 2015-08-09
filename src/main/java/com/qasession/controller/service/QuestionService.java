@@ -1,3 +1,39 @@
+/**
+ * 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) Kai-Ting (Danil) Ko
+ * 
+ * Permission is hereby granted, free of charge, 
+ * to any person obtaining a copy of this software 
+ * and associated documentation files (the "Software"), 
+ * to deal in the Software without restriction, including 
+ * without limitation the rights to use, copy, modify, 
+ * merge, publish, distribute, sublicense, and/or sell 
+ * copies of the Software, and to permit persons to whom 
+ * the Software is furnished to do so, subject to the 
+ * following conditions:
+ * 
+ * The above copyright notice and this permission notice 
+ * shall be included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY 
+ * OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED 
+ * TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS 
+ * OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
+ * USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * 
+ */
+
+/**
+ * 
+ * @author Kai - Ting (Danil) Ko
+ * Question Service class
+ */
+
 package com.qasession.controller.service;
 
 import javax.annotation.Resource;
@@ -42,16 +78,18 @@ public class QuestionService {
 
 	@Resource(shareable = true, name = "getQuestionDao")
 	private QuestionDao mQuestionDao;
-	
+
 	@Resource(shareable = true, name = "getQASessionDao")
 	private QASessionDao mQASessionDao;
+
 	@GET
 	@Path("/{questionId}")
-	@ApiOperation(value = "Find question by question ID", notes = "Returns all question record that this session belong")
+	@ApiOperation(value = "Find question by question ID", response = Question.class)
 	@ApiResponses(value = {
-			@ApiResponse(code = 404, message = "Attendee ID not found"),
+			@ApiResponse(code = 404, message = "Question ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
-	public Response getQuestionById(@PathParam("qasessionId") String pQASessionId,
+	public Response getQuestionById(
+			@PathParam("qasessionId") String pQASessionId,
 			@PathParam("questionId") String pQuestionId) {
 		try {
 
@@ -68,9 +106,10 @@ public class QuestionService {
 	@PUT
 	@Consumes("application/json")
 	@Path("/{questionId}")
-	@ApiOperation(value = "Update an question by question ID within a session ID", notes = "")
+	@ApiOperation(value = "Update a question by question ID within a session ID", response = Question.class, notes = "")
 	@ApiResponses(value = {
-			@ApiResponse(code = 404, message = "Attendee ID not found"),
+			@ApiResponse(code = 200, message = "Update a question by question ID within a session ID operation succes"),
+			@ApiResponse(code = 404, message = "Question ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
 	public Response updateSessionQuestion(
 			@PathParam("qasessionId") String pQASessionId,
@@ -78,36 +117,34 @@ public class QuestionService {
 			@Context HttpServletRequest pHttpServletRequest) {
 		try {
 
-			UserInfo lUserInfo = mUserTranslateDao.getUserInfo(pHttpServletRequest);
+			UserInfo lUserInfo = mUserTranslateDao
+					.getUserInfo(pHttpServletRequest);
 			Attendee lAttendee = mAttendeeDao.getAttendeeByQASessionIdUserId(
 					pQASessionId, lUserInfo.getUserId());
-			
+
 			Question lQuestion = mQuestionDao.getQuestionById(pQuestionId);
 
-			if (lQuestion == null)
-			{
-				return Response
-						.status(Response.Status.NOT_FOUND).build();
-			}  // if
-			
-			if (lUserInfo.getUserRole().equals("ADMIN") ||
-				(lQuestion.getCreatedBy().equals(lUserInfo.getUserId()) == false
-							|| lAttendee == null || !lAttendee.getQASessionRole()
-							.equals("HOST") || ! mQASessionDao.getQASessionById(pQASessionId).equals("OPEN"))) {
+			if (lQuestion == null) {
+				return Response.status(Response.Status.NOT_FOUND).build();
+			} // if
+
+			if (lUserInfo.getUserRole().equals("ADMIN")
+					|| (lQuestion.getCreatedBy().equals(lUserInfo.getUserId()) == false
+							|| lAttendee == null
+							|| !lAttendee.getQASessionRole().equals("HOST") || !mQASessionDao
+							.getQASessionById(pQASessionId).equals("OPEN"))) {
 
 				lQuestion.setQuestionStatus(pQuestion.getQuestionStatus());
 				lQuestion.setQuestionContent(pQuestion.getQuestionContent());
 				lQuestion.setUpdatedBy(lUserInfo.getUserId());
-				
-				
-				return Response.ok().entity(mQuestionDao.updateQuestion(lQuestion))
-						.build();
+
+				return Response.ok()
+						.entity(mQuestionDao.updateQuestion(lQuestion)).build();
 			} // if
 			return Response
 					.status(Response.Status.FORBIDDEN)
 					.entity("{\"status\":\"forbidden\", \"message\":\"user does not have the previliege to perform the particular action\"}")
 					.build();
-			
 
 		} // try
 		catch (Exception pExeception) {
@@ -120,24 +157,27 @@ public class QuestionService {
 	@POST
 	@Consumes("application/json")
 	@Path("/")
-	@ApiOperation(value = "Create an attendee by attendee ID within a session ID", notes = "")
+	@ApiOperation(value = "Create a question within a session ID", response = Question.class, notes = "")
 	@ApiResponses(value = {
-			@ApiResponse(code = 404, message = "Attendee ID not found"),
+			@ApiResponse(code = 200, message = "Create a question within a session ID operation succes"),
+			@ApiResponse(code = 404, message = "Session ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
 	public Response createSessionqQuestion(
 			@PathParam("qasessionId") String pQASessionId, Question pQuestion,
 			@Context HttpServletRequest pHttpServletRequest) {
 		try {
 
-			UserInfo lUserInfo = mUserTranslateDao.getUserInfo(pHttpServletRequest);
+			UserInfo lUserInfo = mUserTranslateDao
+					.getUserInfo(pHttpServletRequest);
 
 			Attendee lAttendee = mAttendeeDao.getAttendeeByQASessionIdUserId(
 					pQASessionId, lUserInfo.getUserId());
 
 			QASession lSession = mQASessionDao.getQASessionById(pQASessionId);
-			
-			if (!lUserInfo.getUserRole().equals("ADMIN") &&
-					(lAttendee == null || !lSession.getQASessionStatus().equals("OPEN"))) {
+
+			if (!lUserInfo.getUserRole().equals("ADMIN")
+					&& (lAttendee == null || !lSession.getQASessionStatus()
+							.equals("OPEN"))) {
 				return Response
 						.status(Response.Status.FORBIDDEN)
 						.entity("{\"status\":\"forbidden\", \"message\":\"user does not have the previliege to perform the particular action\"}")
@@ -146,7 +186,8 @@ public class QuestionService {
 
 			if ((mQuestionDao.getQuestionsBySessionIdUserId(pQASessionId,
 					lUserInfo.getUserId()).size() >= lSession
-					.getQASessionMaxQuestion()) || !lAttendee.getQASessionRole().equalsIgnoreCase("HOST")) {
+					.getQASessionMaxQuestion())
+					|| !lAttendee.getQASessionRole().equalsIgnoreCase("HOST")) {
 				return Response
 						.status(Response.Status.FORBIDDEN)
 						.entity("{\"status\":\"forbidden\", \"message\":\"user exceeds allowed questions in the session\"}")
@@ -171,6 +212,7 @@ public class QuestionService {
 	@Path("/{questionId}")
 	@ApiOperation(value = "Delete an question by question ID within a session ID", notes = "")
 	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Delete an question by question ID within a session ID operation success"),
 			@ApiResponse(code = 404, message = "Question ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
 	public Response deleteSessionQuestion(
@@ -179,24 +221,26 @@ public class QuestionService {
 			@Context HttpServletRequest pHttpServletRequest) {
 		try {
 
-			UserInfo lUserInfo = mUserTranslateDao.getUserInfo(pHttpServletRequest);
+			UserInfo lUserInfo = mUserTranslateDao
+					.getUserInfo(pHttpServletRequest);
 			Attendee lAttendee = mAttendeeDao.getAttendeeByQASessionIdUserId(
 					pQASessionId, lUserInfo.getUserId());
 
 			QASession lSession = mQASessionDao.getQASessionById(pQASessionId);
-			
+
 			Question lQuestion = mQuestionDao.getQuestionById(pQuestionId);
-			
-			
-			if (!lUserInfo.getUserRole().equals("ADMIN") || (
-							lAttendee != null && lSession.getQASessionStatus().equals("OPEN") && (lAttendee.getQASessionRole()
-							.equals("HOST") || lQuestion.getCreatedBy().equals(lAttendee.getUserId())))) {
+
+			if (!lUserInfo.getUserRole().equals("ADMIN")
+					|| (lAttendee != null
+							&& lSession.getQASessionStatus().equals("OPEN") && (lAttendee
+							.getQASessionRole().equals("HOST") || lQuestion
+							.getCreatedBy().equals(lAttendee.getUserId())))) {
 				mQuestionDao.deleteQuestionById(pQuestionId);
 
 				return Response.ok().entity("{\"status\":\"success\"}").build();
 
 			} // if
-		
+
 			return Response
 					.status(Response.Status.FORBIDDEN)
 					.entity("{\"status\":\"forbidden\", \"message\":\"user does not have the previliege to perform the particular action\"}")

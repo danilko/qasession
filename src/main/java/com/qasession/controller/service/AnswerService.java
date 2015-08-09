@@ -1,3 +1,39 @@
+/**
+ * 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) Kai-Ting (Danil) Ko
+ * 
+ * Permission is hereby granted, free of charge, 
+ * to any person obtaining a copy of this software 
+ * and associated documentation files (the "Software"), 
+ * to deal in the Software without restriction, including 
+ * without limitation the rights to use, copy, modify, 
+ * merge, publish, distribute, sublicense, and/or sell 
+ * copies of the Software, and to permit persons to whom 
+ * the Software is furnished to do so, subject to the 
+ * following conditions:
+ * 
+ * The above copyright notice and this permission notice 
+ * shall be included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY 
+ * OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED 
+ * TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS 
+ * OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
+ * USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * 
+ */
+
+/**
+ * 
+ * @author Kai - Ting (Danil) Ko
+ * Answer Service class
+ */
+
 package com.qasession.controller.service;
 
 import javax.annotation.Resource;
@@ -46,10 +82,11 @@ public class AnswerService {
 	private UserTranslateDao mUserTranslateDao;
 	
 	@GET
-	@Path("/{answerid}")
-	@ApiOperation(value = "Find answer by answer ID", notes = "Returns the answer that has this question id")
+	@Path("/{answerId}")
+	@ApiOperation(value = "Find answer by answer ID", response=Answer.class, notes = "Returns the answer that has this answer id")
 	@ApiResponses(value = {
-			@ApiResponse(code = 404, message = "Attendee ID not found"),
+			@ApiResponse(code = 404, message = "Answer object for the Answer ID"),
+			@ApiResponse(code = 404, message = "Answer ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
 	public Response getAnswer(@PathParam("qasessionId") String pQASessionId,
 			@PathParam("questionId") String pQuestionId,
@@ -76,9 +113,10 @@ public class AnswerService {
 	@PUT
 	@Consumes("application/json")
 	@Path("/{answerId}")
-	@ApiOperation(value = "Update an answer by answer ID", notes = "")
+	@ApiOperation(value = "Update an answer by answer ID", response=Answer.class, notes = "")
 	@ApiResponses(value = {
-			@ApiResponse(code = 404, message = "Attendee ID not found"),
+			@ApiResponse(code = 200, message = "Update answer by answer ID operation success"),
+			@ApiResponse(code = 404, message = "Answer ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
 	public Response updateAnswer(@PathParam("qasessionId") String pQASessionId,
 			@PathParam("questionId") String pQuestionId,
@@ -125,9 +163,10 @@ public class AnswerService {
 	@POST
 	@Consumes("application/json")
 	@Path("/")
-	@ApiOperation(value = "Create an answer within a qasession id and a question id", notes = "")
+	@ApiOperation(value = "Create an answer within the question by question ID", response=Answer.class, notes = "")
 	@ApiResponses(value = {
-			@ApiResponse(code = 404, message = "Attendee ID not found"),
+			@ApiResponse(code = 200, message = "Create answer by questionID operation success"),
+			@ApiResponse(code = 404, message = "Question ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
 	public Response createAnswer(@PathParam("qasessionId") String pQASessionId,
 			@PathParam("questionId") String pQuestionId, Answer pAnswer,
@@ -164,9 +203,9 @@ public class AnswerService {
 
 	@DELETE
 	@Path("/{answerId}")
-	@ApiOperation(value = "Delete an answer by answer ID", notes = "")
+	@ApiOperation(value = "Delete an answer by answer ID", response=Answer.class, notes = "")
 	@ApiResponses(value = {
-			@ApiResponse(code = 404, message = "Answer ID not found"),
+			@ApiResponse(code = 200, message = "Deleate an answer by answer ID operation success"),
 			@ApiResponse(code = 403, message = "Not authorized") })
 	public Response deleteAnswer(@PathParam("qasessionId") String pQASessionId,
 			@PathParam("questionId") String pQuestionId,
