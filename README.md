@@ -53,9 +53,28 @@ Please generate a new app for website at Facebook API Website:
 https://developers.facebook.com/
 
 Under Facebook App Settings, please go to Settings
-For basic, website url should be http://localhost:8080/controller/OAuthConsumerResponseCode
-For advanced, redirect uri should be http://localhost:8080/controller/OAuthConsumerResponseCode
-Please note the current support Facebook Graph API is minumum v2.4 
+For "basic" section, website url should be (assume it is controller.war)
+```
+http://<HOST>:<HOST_PORT>/controller/OAuthConsumerResponseCode
+```
+Example
+```
+http://localhost:8080/controller/OAuthConsumerResponseCode
+```
+
+For "advanced" section, redirect uri should be 
+```
+http://<HOST>:<HOST_PORT>/controller/OAuthConsumerResponseCode
+```
+Example
+```
+http://localhost:8080/controller/OAuthConsumerResponseCode
+```
+
+Please note the current support Facebook Graph API is minumum
+```
+v2.4 
+```
 
 Please download docker and other require tools
 JDK 7 or Above 
