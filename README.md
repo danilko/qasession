@@ -70,6 +70,9 @@ https://www.docker.com/
 PSQL Client Tools 
 https://wiki.postgresql.org/wiki/Community_Guide_to_PostgreSQL_GUI_Tools
 
+LC_ALL Detail Descriptions
+http://www.jvmhost.com/articles/locale-breaks-unicode-utf-8-java-tomcat
+
 ```
 export CONTAINER=$(docker run -p 127.0.0.1:5432:5432 -d stackbrew/postgres:latest)
 export CONTAINER_IP=$(docker inspect $CONTAINER | grep IPAddress | awk '{ print $2 }' | tr -d ',"')
@@ -78,20 +81,21 @@ export PGPASSWORD=postgres
 sleep 30;
 psql -h 127.0.0.1 -U postgres < postgresql_ods.sql
 
-export JDBC_DRIVERCLASSNAME=org.postgresql.Driver
-export JDBC_MAXCONNECTIONPERPARTITION=2
-export JDBC_MINCONNECTIONPERPARTITION=2
-export JDBC_USERNAME=postgres
-export JDBC_PASSWORD=postgres
-export JDBC_URL=jdbc:postgresql://127.0.0.1:5432/postgres
-export OAUTH_API_CLIENT_ID=<FB_OAUTH_CLIENT_ID>
+export JDBC_DRIVERCLASSNAME="org.postgresql.Driver"
+export JDBC_MAXCONNECTIONPERPARTITION="2"
+export JDBC_MINCONNECTIONPERPARTITION="2"
+export JDBC_USERNAME="postgres"
+export JDBC_PASSWORD="postgres"
+export JDBC_URL="jdbc:postgresql://127.0.0.1:5432/postgres"
+export OAUTH_API_CLIENT_ID="<FB_OAUTH_CLIENT_ID>"
+export LC_ALL="en_US.UTF-8"
 export OAUTH_API_CLIENT_SECRET=<FB_OAUTH_CLIENT_SECRET>
-export OAUTH_API_SCOPES=email,public_profile
-export OAUTH_AUTH_URI=https://graph.facebook.com
-export OAUTH_REDUCT_URI=http://localhost:8080/controller/OAuthConsumerResponseCode
+export OAUTH_API_SCOPES="email,public_profile"
+export OAUTH_AUTH_URI="https://graph.facebook.com"
+export OAUTH_REDUCT_URI="http://localhost:8080/controller/OAuthConsumerResponseCode"
 
 // Pass in FB Profile ID to allow admin access across application level wide
-export APP_ADMIN_OAUTH_IDENTITIY_ID_LIST=<FB_IDENTITY_ID_1>,<FB_IDENTITY_ID_2>
+export APP_ADMIN_OAUTH_IDENTITIY_ID_LIST="<FB_IDENTITY_ID_1>,<FB_IDENTITY_ID_2>"
 
 mvn clean tomcat:run - DskipTests
 ```
