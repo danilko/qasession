@@ -3,7 +3,7 @@ package com.qasession.controller.security;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class UserInfo {
-	@JsonProperty("uid")
+	@JsonProperty("userId")
 	private String userId;
 
 	@JsonProperty("access_token")

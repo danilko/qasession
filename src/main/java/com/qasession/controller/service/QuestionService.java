@@ -23,7 +23,6 @@ import com.qasession.controller.dao.UserTranslateDao;
 import com.qasession.controller.model.Attendee;
 import com.qasession.controller.model.Question;
 import com.qasession.controller.model.QASession;
-import com.qasession.controller.security.FacebookClient;
 import com.qasession.controller.security.UserInfo;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponses;
@@ -79,8 +78,7 @@ public class QuestionService {
 			@Context HttpServletRequest pHttpServletRequest) {
 		try {
 
-			UserInfo lUserInfo = (UserInfo) pHttpServletRequest.getSession()
-					.getAttribute(FacebookClient.getUserInfoSessionId());
+			UserInfo lUserInfo = mUserTranslateDao.getUserInfo(pHttpServletRequest);
 			Attendee lAttendee = mAttendeeDao.getAttendeeByQASessionIdUserId(
 					pQASessionId, lUserInfo.getUserId());
 			
@@ -131,8 +129,7 @@ public class QuestionService {
 			@Context HttpServletRequest pHttpServletRequest) {
 		try {
 
-			UserInfo lUserInfo = (UserInfo) pHttpServletRequest.getSession()
-					.getAttribute(FacebookClient.getUserInfoSessionId());
+			UserInfo lUserInfo = mUserTranslateDao.getUserInfo(pHttpServletRequest);
 
 			Attendee lAttendee = mAttendeeDao.getAttendeeByQASessionIdUserId(
 					pQASessionId, lUserInfo.getUserId());
@@ -182,8 +179,7 @@ public class QuestionService {
 			@Context HttpServletRequest pHttpServletRequest) {
 		try {
 
-			UserInfo lUserInfo = (UserInfo) pHttpServletRequest.getSession()
-					.getAttribute(FacebookClient.getUserInfoSessionId());
+			UserInfo lUserInfo = mUserTranslateDao.getUserInfo(pHttpServletRequest);
 			Attendee lAttendee = mAttendeeDao.getAttendeeByQASessionIdUserId(
 					pQASessionId, lUserInfo.getUserId());
 

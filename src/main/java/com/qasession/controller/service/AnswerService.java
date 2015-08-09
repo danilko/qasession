@@ -20,10 +20,10 @@ import com.qasession.controller.dao.AnswerDao;
 import com.qasession.controller.dao.AttendeeDao;
 import com.qasession.controller.dao.QASessionDao;
 import com.qasession.controller.dao.QuestionDao;
+import com.qasession.controller.dao.UserTranslateDao;
 import com.qasession.controller.model.Answer;
 import com.qasession.controller.model.Attendee;
 import com.qasession.controller.model.QASession;
-import com.qasession.controller.security.FacebookClient;
 import com.qasession.controller.security.UserInfo;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponses;
@@ -42,7 +42,9 @@ public class AnswerService {
 	private QASessionDao mQASessionDao;
 	@Resource(shareable = true, name = "getQuestionDao")
 	private QuestionDao mQuestionDao;
-
+	@Resource(shareable = true, name = "getUserTranslateDao")
+	private UserTranslateDao mUserTranslateDao;
+	
 	@GET
 	@Path("/{answerid}")
 	@ApiOperation(value = "Find answer by answer ID", notes = "Returns the answer that has this question id")
@@ -73,7 +75,7 @@ public class AnswerService {
 
 	@PUT
 	@Consumes("application/json")
-	@Path("/{answerid}")
+	@Path("/{answerId}")
 	@ApiOperation(value = "Update an answer by answer ID", notes = "")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "Attendee ID not found"),
@@ -84,8 +86,7 @@ public class AnswerService {
 			@Context HttpServletRequest pHttpServletRequest) {
 		try {
 
-			UserInfo lUserInfo = (UserInfo) pHttpServletRequest.getSession()
-					.getAttribute(FacebookClient.getUserInfoSessionId());
+			UserInfo lUserInfo = mUserTranslateDao.getUserInfo(pHttpServletRequest);
 			
 			Attendee lAttendee = mAttendeeDao.getAttendeeByQASessionIdUserId(
 					pQASessionId, lUserInfo.getUserId());
@@ -106,8 +107,7 @@ public class AnswerService {
 			    lAnswer.setAnswerContent(pAnswer.getAnswerContent());
 			    lAnswer.setUpdatedBy(lUserInfo.getUserId());
 				
-				mAnswerDao.updateAnswerById(lAnswer);
-				return Response.ok().entity(mAnswerDao.createAnswer(pAnswer))
+				return Response.ok().entity(mAnswerDao.updateAnswerById(lAnswer))
 						.build();
 			} // if
 			
@@ -134,8 +134,7 @@ public class AnswerService {
 			@Context HttpServletRequest pHttpServletRequest) {
 		try {
 
-			UserInfo lUserInfo = (UserInfo) pHttpServletRequest.getSession()
-					.getAttribute(FacebookClient.getUserInfoSessionId());
+			UserInfo lUserInfo = mUserTranslateDao.getUserInfo(pHttpServletRequest);
 			Attendee lAttendee = mAttendeeDao.getAttendeeByQASessionIdUserId(
 					pQASessionId, lUserInfo.getUserId());
 
@@ -164,7 +163,7 @@ public class AnswerService {
 	} // Response createAnswer
 
 	@DELETE
-	@Path("/{answerid}")
+	@Path("/{answerId}")
 	@ApiOperation(value = "Delete an answer by answer ID", notes = "")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "Answer ID not found"),
@@ -175,14 +174,13 @@ public class AnswerService {
 			@Context HttpServletRequest pHttpServletRequest) {
 		try {
 
-			UserInfo lUserInfo = (UserInfo) pHttpServletRequest.getSession()
-					.getAttribute(FacebookClient.getUserInfoSessionId());
+			UserInfo lUserInfo = mUserTranslateDao.getUserInfo(pHttpServletRequest);
 			Attendee lAttendee = mAttendeeDao.getAttendeeByQASessionIdUserId(
 					pQASessionId, lUserInfo.getUserId());
             QASession lQASession = mQASessionDao.getQASessionById(pQASessionId);
 			if (lUserInfo.getUserRole().equals("ADMIN") || 
 					(lAttendee != null && lQASession.getQASessionStatus().equals("OPEN") && lAttendee.getQASessionRole().equals("HOST"))) {
-				mAnswerDao.deleteAnswerById(pQuestionId);
+				mAnswerDao.deleteAnswerById(pAnswerId);
 				return Response.ok().entity("{\"status\":\"success\"}").build();
 			} // if
 

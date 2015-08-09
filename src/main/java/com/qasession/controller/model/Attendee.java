@@ -39,12 +39,12 @@ public class Attendee implements Serializable
 	@Column(name = "qasession_role", nullable = false)  
 	private String qasessionRole;
 	
-	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd,HH:00", timezone="UTC")
+	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd,HH:mm", timezone="UTC")
 	@Column(name = "update_timestamp", nullable = false)  
 	@Temporal(TemporalType.TIMESTAMP) 
     private Calendar updateTimestamp;
 	
-	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd,HH:00", timezone="UTC")
+	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd,HH:mm", timezone="UTC")
 	@Column(name = "create_timestamp", nullable = false)  
 	@Temporal(TemporalType.TIMESTAMP) 
     private Calendar createTimestamp;

@@ -16,6 +16,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+/**
+ * @author danilko
+ *
+ */
 @Entity
 @Table(name="usertranslate")
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userId")
@@ -47,16 +51,32 @@ public class UserTranslate implements Serializable{
 	@Column(name = "name")  
 	private String name;
 	
-	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd,HH:00", timezone="UTC")
+	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd,HH:mm", timezone="UTC")
 	@Column(name = "update_timestamp", nullable = false)  
 	@Temporal(TemporalType.TIMESTAMP) 
     private Calendar updateTimestamp;
 	
-	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd,HH:00", timezone="UTC")
+	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd,HH:mm", timezone="UTC")
 	@Column(name = "create_timestamp", nullable = false)  
 	@Temporal(TemporalType.TIMESTAMP) 
     private Calendar createTimestamp;
 	
+	public Calendar getUpdateTimestamp() {
+		return updateTimestamp;
+	}
+
+	public void setUpdateTimestamp(Calendar updateTimestamp) {
+		this.updateTimestamp = updateTimestamp;
+	}
+
+	public Calendar getCreateTimestamp() {
+		return createTimestamp;
+	}
+
+	public void setCreateTimestamp(Calendar createTimestamp) {
+		this.createTimestamp = createTimestamp;
+	}
+
 	public String getUserId() {
 		return userId;
 	}

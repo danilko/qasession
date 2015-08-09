@@ -23,37 +23,6 @@ public class SpringAnswerDao implements AnswerDao {
 	private EntityManager mEntityManager;
 
 	@Transactional(rollbackFor = Throwable.class)
-	public List<Answer> getAnswerByKeyValue(String pKeyName, String pKeyValue)
-			throws Exception {
-		// Create query to find session info
-		String lBasedQuery = "SELECT answer_object FROM Answer answer_object WHERE answer_object."
-				+ pKeyName + " LIKE :pKeyValue";
-
-		Query lQuery = mEntityManager.createQuery(lBasedQuery);
-		lQuery = lQuery.setParameter("pKeyValue", pKeyValue);
-
-		List<?> lQueryList = lQuery.getResultList();
-
-		// Create new list to store account
-		List<Answer> lLists = new ArrayList<Answer>(0);
-
-		// Check items in list and cast to account only if it is an instance
-		// of
-		// account object
-		// Throw exception if there is an cast error
-		for (Object lObject : lQueryList) {
-			if (lObject instanceof Answer) {
-				lLists.add((Answer) lObject);
-			} // if
-			else {
-				throw new ClassCastException();
-			} // else
-		} // for
-
-		return lLists;
-	} // List<Answer> getAnswerByKeyValue
-
-	@Transactional(rollbackFor = Throwable.class)
 	public Answer createAnswer(Answer pAnswer) throws Exception {
 		pAnswer.setAnswerId(RandomStringGenerator
 				.generator(RandomStringGenerator.ID_LENTH));
@@ -97,11 +66,34 @@ public class SpringAnswerDao implements AnswerDao {
 	} // Answer updateAttendeeById
 
 	public Answer getAnswerById(String pAnswerId) throws Exception {
-		List<Answer> lList = getAnswerByKeyValue("answerId", pAnswerId);
+		// Create query to find session info
+		String lBasedQuery = "SELECT answer_object FROM Answer answer_object WHERE answer_object.answerId = :answerId";
 
-		if (lList.size() > 0) {
-			return lList.get(0);
-		} // if
+		Query lQuery = mEntityManager.createQuery(lBasedQuery);
+		lQuery = lQuery.setParameter("answerId", pAnswerId);
+
+		List<?> lQueryList = lQuery.getResultList();
+
+		// Create new list to store account
+		List<Answer> lLists = new ArrayList<Answer>(0);
+
+		// Check items in list and cast to account only if it is an instance
+		// of
+		// account object
+		// Throw exception if there is an cast error
+		for (Object lObject : lQueryList) {
+			if (lObject instanceof Answer) {
+				lLists.add((Answer) lObject);
+			} // if
+			else {
+				throw new ClassCastException();
+			} // else
+		} // for
+
+		if(lLists.size() > 0)
+		{
+			return lLists.get(0);
+		}
 
 		return null;
 	} // Answer getAnswerById

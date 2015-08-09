@@ -73,7 +73,6 @@ var NANESPACE_QA_SESSION = {
 		return lUserTranslate;
 	},
 	showSessionDetail : function(qasessionId) {
-
 		$("#divSessionDetail").hide();
 		$("#divSessionList").hide();
 
@@ -105,80 +104,9 @@ var NANESPACE_QA_SESSION = {
 
 						if (data.questions.length > 0) {
 							$("#divSessionDetailQuestions").empty();
-							$
-									.each(
-											data.questions,
-											function(i, question) {
-												if (question.answer != null) {
-													questionAnswerStatus = "Answered";
-												}
-												else
-												{
-													questionAnswerStatus = "Not Answered";
-												}
-												
-												questionSection = "<div id=\"divQuestion_"
-														+ question.questionId
-														+ "\"><span class=\"label label-primary\">Question</span> <span class=\"label label-info\">"
-														+ question.questionStatus
-														+ "</span> <span class=\"label label-info\">" + questionAnswerStatus + "</span><br/><br/><div id='"
-														+ question.qasessionId
-														+ "_"
-														+ question.questionId
-														+ "_question_content_text_view' onClick=\"NANESPACE_QA_SESSION.editQuestion('"
-														+ question.qasessionId
-														+ "', '"
-														+ question.questionId
-														+ "');\"><blockquote>"
-														+ question.questionContent
-														+ "<footer>Last Update On "
-														+ question.updateTimestamp
-														+ " UCT By "
-														+ NANESPACE_QA_SESSION
-																.findUserTranslate(question.updatedBy).name
-														+ "</footer></div><div id='"
-												question.qasessionId
-														+ "_"
-														+ question.questionId
-														+ "_question_content_text_edit'><textarea style=\"display: none;\" class=\"form-control\" rows=\"5\">"
-														+ question.questionContent
-														+ "</textarea><></div>";
-
-												if (question.answer == null) {
-													questionSection = questionSection
-															+ "<a href=\"#\" onClick=\"NANESPACE_QA_SESSION.createAnswer('"
-															+ question.qasessionId
-															+ "', '"
-															+ question.qasessionId
-															+ "_"
-															+ question.questionId
-															+ "');\"><span class=\"glyphicon glyphicon-console\"></a>";
-												}
-
-												questionSection = questionSection
-														+ "<a href=\"#\" onClick=\"NANESPACE_QA_SESSION.editQuestion('"
-														+ question.qasessionId
-														+ "', '"
-														+ question.questionId
-														+ "');\"><span class=\"glyphicon glyphicon-pencil\"><a href=\"#\" onClick=\"NANESPACE_QA_SESSION.deleteQuestion('"
-														+ question.qasessionId
-														+ "', '"
-														+ question.questionId
-														+ "');\"><span class=\"glyphicon glyphicon-trash\"></span></a></p></div>";
-
-												if (question.answer != null) {
-													questionSection = questionSection
-															+ "<blockquote><span class=\"label label-success\">Answer</span> <span class=\"label label-info\">Last Update By "
-															+ NANESPACE_QA_SESSION
-																	.findUserTranslate(question.answer.updatedBy).name
-															+ "</span><p> "
-															+ question.answer.answerContent
-															+ " </p></blockquote>";
-												} // if
-
-												$("#divSessionDetailQuestions")
-														.append(questionSection);
-											});
+							$.each(data.questions, function(i, question) {
+								NANESPACE_QA_SESSION.showQuestion(question);
+							});
 						} // if
 						else {
 							$("#divSessionDetailQuestions")
@@ -339,6 +267,180 @@ var NANESPACE_QA_SESSION = {
 					}
 				});
 	}, // deleteSession : function()
+	showQuestion : function(question) {
+		if (question.answers.length > 0) {
+			questionAnswerStatus = "Answered";
+		} else {
+			questionAnswerStatus = "No Answer";
+		}
+
+		if (!$("#divQuestion_" + question.questionId).length) {
+			$("#divSessionDetailQuestions").append(
+					"<div id=\"divQuestion_" + question.questionId
+							+ "\"></div>");
+		} else {
+			$("#divQuestion_" + question.questionId).empty();
+		}
+
+		questionSection = "<span class=\"label label-primary\">Question</span> <span class=\"label label-info\">"
+				+ question.questionStatus
+				+ "</span> <span class=\"label label-info\">"
+				+ questionAnswerStatus
+				+ "</span><br/><br/><div id='divShowQuestion_"
+				+ question.questionId
+				+ "'><blockquote id='blockquoteShowQuestion_"
+				+ question.questionId
+				+ "' onClick=\"NANESPACE_QA_SESSION.editQuestion('"
+				+ question.questionId
+				+ "');\">"
+				+ question.questionContent
+				+ "<footer>Last Update On "
+				+ question.updateTimestamp
+				+ " UCT By "
+				+ NANESPACE_QA_SESSION.findUserTranslate(question.updatedBy).name
+				+ "</footer></div><div style=\"display: none;\" id='divEditQuestion_"
+				+ question.questionId
+				+ "'><textarea id='textareaEditQuestion_"
+				+ question.questionId
+				+ "' class=\"form-control\" rows=\"5\">"
+				+ question.questionContent
+				+ "</textarea></div><div class=\"text-right\">";
+
+		if (question.answers.length == 0) {
+			questionSection = questionSection
+					+ "<a href=\"#\" id=\"ahrefCreateAnswer_"
+					+ question.questionId
+					+ "\" onClick=\"NANESPACE_QA_SESSION.createAnswer('"
+					+ question.questionId
+					+ "');\"><span class=\"glyphicon glyphicon-console\"></a>";
+		}
+
+		questionSection = questionSection
+				+ " <a href=\"#\" id=\"ahrefEditQuestion_"
+				+ question.questionId
+				+ "\"  onClick=\"NANESPACE_QA_SESSION.editQuestion('"
+				+ question.questionId
+				+ "');\"><span class=\"glyphicon glyphicon-pencil\"></a>";
+
+		questionSection = questionSection
+				+ " <a href=\"#\" style=\"display : none;\" id=\"ahrefSaveQuestion_"
+				+ question.questionId
+				+ "\"  onClick=\"NANESPACE_QA_SESSION.saveQuestion('"
+				+ question.qasessionId + "', '" + question.questionId
+				+ "');\"><span class=\"glyphicon glyphicon-floppy-saved\"></a>";
+
+		questionSection = questionSection
+				+ " <a href=\"#\" style=\"display : none;\" id=\"ahrefCancelEditQuestion_"
+				+ question.questionId
+				+ "\"  onClick=\"NANESPACE_QA_SESSION.cancelEditQuestion('"
+				+ question.questionId
+				+ "');\"><span class=\"glyphicon glyphicon-floppy-remove\"></a>";
+
+		questionSection = questionSection
+				+ "<a href=\"#\" id=\"ahrefDeleteQuestion_"
+				+ question.questionId
+				+ "\" onClick=\"NANESPACE_QA_SESSION.deleteQuestion('"
+				+ question.qasessionId
+				+ "', '"
+				+ question.questionId
+				+ "');\"><span class=\"glyphicon glyphicon-trash\"></span></a></div>";
+
+		if (question.answers.length > 0) {
+			$
+					.each(
+							question.answers,
+							function(i, answer) {
+
+								questionSection = questionSection
+										+ "<div id = \"divAnswer_"
+										+ answer.answerId
+										+ "\"><span class=\"label label-primary\">Answer</span><br/><br/><div id='divShowAnswer_"
+										+ answer.answerId
+										+ "'><blockquote id='blockquoteShowAnswer_"
+										+ answer.answerId
+										+ "' onClick=\"NANESPACE_QA_SESSION.editAnswer('"
+										+ answer.answerId
+										+ "');\">"
+										+ answer.answerContent
+										+ "<footer>Last Update On "
+										+ answer.updateTimestamp
+										+ " UCT By "
+										+ NANESPACE_QA_SESSION
+												.findUserTranslate(answer.updatedBy).name
+										+ "</footer></blockquote></div><div style=\"display: none;\" id='divEditAnswer_"
+										+ answer.answerId
+										+ "'><textarea id='textareaEditAnswer_"
+										+ answer.answerId
+										+ "' class=\"form-control\" rows=\"5\">"
+										+ answer.answerContent
+										+ "</textarea></div><div class=\"text-right\">";
+
+								questionSection = questionSection
+										+ " <a href=\"#\" id=\"ahrefEditAnswer_"
+										+ answer.answerId
+										+ "\"  onClick=\"NANESPACE_QA_SESSION.editAnswer('"
+										+ answer.answerId
+										+ "');\"><span class=\"glyphicon glyphicon-pencil\"></a>";
+
+								questionSection = questionSection
+										+ " <a href=\"#\" style=\"display : none;\" id=\"ahrefSaveAnswer_"
+										+ answer.answerId
+										+ "\"  onClick=\"NANESPACE_QA_SESSION.saveAnswer('"
+										+ question.qasessionId
+										+ "', '"
+										+ question.questionId
+										+ "', '"
+										+ answer.answerId
+										+ "');\"><span class=\"glyphicon glyphicon-floppy-saved\"></a>";
+
+								questionSection = questionSection
+										+ " <a href=\"#\" style=\"display : none;\" id=\"ahrefCancelEditAnswer_"
+										+ answer.answerId
+										+ "\"  onClick=\"NANESPACE_QA_SESSION.cancelEditAnswer('"
+										+ answer.answerId
+										+ "');\"><span class=\"glyphicon glyphicon-floppy-remove\"></a>";
+
+								questionSection = questionSection
+										+ "<a href=\"#\" id=\"ahrefDeleteAnswer_"
+										+ answer.answerId
+										+ "\" onClick=\"NANESPACE_QA_SESSION.deleteAnswer('"
+										+ question.qasessionId
+										+ "', '"
+										+ question.questionId
+										+ "', '"
+										+ answer.answerId
+										+ "');\"><span class=\"glyphicon glyphicon-trash\"></span></a></div></div>";
+							});
+		} // if
+		else {
+			questionSection = questionSection
+					+ "<div style=\"display: none;\" id='divNewAnswer_"
+					+ question.questionId
+					+ "'><div><textarea id='textareaNewAnswer_"
+					+ question.questionId
+					+ "' class=\"form-control\" rows=\"5\" placeholder=\"Enter answer content\"></textarea></div><div class=\"text-right\">";
+
+			questionSection = questionSection
+					+ " <a href=\"#\" id=\"ahrefSaveNewAnswer_"
+					+ question.qasessionId
+					+ "\"  onClick=\"NANESPACE_QA_SESSION.saveNewAnswer('"
+					+ question.qasessionId
+					+ "', '"
+					+ question.questionId
+					+ "');\"><span class=\"glyphicon glyphicon-floppy-saved\"></a>";
+
+			questionSection = questionSection
+					+ " <a href=\"#\" id=\"ahrefCancelNewAnswer_"
+					+ question.qasessionId
+					+ "\"  onClick=\"NANESPACE_QA_SESSION.cancelNewAnswer('"
+					+ question.qasessionId
+					+ "');\"><span class=\"glyphicon glyphicon-floppy-remove\"></a></div>";
+		}
+
+		questionSection = questionSection + "</div>";
+
+		$("#divQuestion_" + question.questionId).append(questionSection);
+	},
 	createQuestion : function(qasessionId) {
 		var questionObject = new Object();
 		questionObject.questionStatus = "OPEN";
@@ -372,30 +474,72 @@ var NANESPACE_QA_SESSION = {
 					}
 				});
 	}, // createQuestion : function()
-	editQuestion : function(qasessionId, questionId) {
-		$("#" + qasessionId + "_" + questionId + "_question_content_text_view")
-				.hide();
-		$("#" + qasessionId + "_" + questionId + "_question_content_text_edit")
-				.show();
-	},
-	createAnswer : function(qasessionId, questionId) {
-		var answerObject = new Object();
-		answerObject.answerContent = $("#sessionQuestionAnswerContent").val();
+	saveQuestion : function(qasessionId, questionId) {
+
+		var questionObject = new Object();
+		questionObject.questionStatus = "OPEN";
+		questionObject.questionContent = $(
+				"#textareaEditQuestion_" + questionId).val();
 
 		$
 				.ajax({
-					type : 'POST',
+					type : 'PUT',
 					url : 'rest/qasession/' + qasessionId + "/question/"
-							+ questionId + "/answer",
+							+ questionId,
 					contentType : 'application/json',
-					data : JSON.stringify(answerObject),
+					data : JSON.stringify(questionObject),
+					dataType : 'json',
+					success : function(question) {
+
+						NANESPACE_QA_SESSION.showQuestion(question);
+						NANESPACE_QA_SESSION.addSessionAlert("SUCCESS",
+								"The question is updated now.");
+					}, // success
+					error : function(jqXHR, textStatus, errorThrown) {
+						alertMessage = "";
+						if (jqXHR.status == 403) {
+							alertMessage = "This operation is not allowed"
+						} // if
+						else {
+							alertMessage = "There is something wrong with backend, please try again later."
+						} // else
+						NANESPACE_QA_SESSION.addSessionAlert("FAILURE",
+								alertMessage);
+					}
+				});
+	},
+	editQuestion : function(questionId) {
+		$("#divShowQuestion_" + questionId).hide();
+		$("#divEditQuestion_" + questionId).show();
+
+		$("#ahrefEditQuestion_" + questionId).hide();
+		$("#ahrefCancelEditQuestion_" + questionId).show();
+		$("#ahrefSaveQuestion_" + questionId).show();
+
+	},
+	cancelEditQuestion : function(questionId) {
+
+		$("#divEditQuestion_" + questionId).hide();
+		$("#divShowQuestion_" + questionId).show();
+
+		$("#ahrefEditQuestion_" + questionId).show();
+		$("#ahrefCancelEditQuestion_" + questionId).hide();
+		$("#ahrefSaveQuestion_" + questionId).hide();
+	},
+	deleteQuestion : function(qasessionId, questionId) {
+
+		$
+				.ajax({
+					type : 'DELETE',
+					url : 'rest/qasession/' + qasessionId + "/question/"
+							+ questionId,
+					contentType : 'application/json',
 					dataType : 'json',
 					success : function(data) {
+						$("#divQuestion_" + questionId).remove();
 
-						NANESPACE_QA_SESSION
-								.showSessionDetail(data.qasessionId);
 						NANESPACE_QA_SESSION.addSessionAlert("SUCCESS",
-								"The answer is added now.");
+								"The question is removed now.");
 
 					}, // success
 					error : function(jqXHR, textStatus, errorThrown) {
@@ -410,18 +554,149 @@ var NANESPACE_QA_SESSION = {
 								alertMessage);
 					}
 				});
+	}, // deleteSession : function()
+	createAnswer : function(questionId) {
+
+		$("#divNewAnswer_" + questionId).show();
+		$("#ahrefCreateAnswer_" + questionId).hide();
 	}, // createQuestion : function()
-	deleteQuestion : function(qasessionId, questionId) {
+	saveNewAnswer : function(qasessionId, questionId) {
+		var answerObject = new Object();
+		answerObject.answerContent = $("#textareaNewAnswer_" + questionId)
+				.val();
+
+		$
+				.ajax({
+					type : 'POST',
+					url : 'rest/qasession/' + qasessionId + "/question/"
+							+ questionId + "/answer",
+					contentType : 'application/json',
+					data : JSON.stringify(answerObject),
+					dataType : 'json',
+					async : false,
+					error : function(jqXHR, textStatus, errorThrown) {
+						alertMessage = "";
+						if (jqXHR.status == 403) {
+							alertMessage = "This operation is not allowed"
+						} // if
+						else {
+							alertMessage = "There is something wrong with backend, please try again later."
+						} // else
+						NANESPACE_QA_SESSION.addSessionAlert("FAILURE",
+								alertMessage);
+					}
+				});
+
+		$
+				.ajax({
+					type : 'GET',
+					url : 'rest/qasession/' + qasessionId + "/question/"
+							+ questionId,
+					contentType : 'application/json',
+					dataType : 'json',
+					success : function(question) {
+						NANESPACE_QA_SESSION.showQuestion(question);
+						NANESPACE_QA_SESSION.addSessionAlert("SUCCESS",
+								"The answer is updated now.");
+					},
+					error : function(jqXHR, textStatus, errorThrown) {
+						alertMessage = "";
+						if (jqXHR.status == 403) {
+							alertMessage = "This operation is not allowed"
+						} // if
+						else {
+							alertMessage = "There is something wrong with backend, please try again later."
+						} // else
+						NANESPACE_QA_SESSION.addSessionAlert("FAILURE",
+								alertMessage);
+					}
+				});
+	}, // createQuestion : function()
+	saveAnswer : function(qasessionId, questionId, answerId) {
+		var answerObject = new Object();
+		answerObject.answerContent = $("#textareaEditAnswer_" + answerId).val();
+
+		$
+				.ajax({
+					type : 'PUT',
+					url : 'rest/qasession/' + qasessionId + "/question/"
+							+ questionId + "/answer/" + answerId,
+					contentType : 'application/json',
+					data : JSON.stringify(answerObject),
+					dataType : 'json',
+					async : false,
+					error : function(jqXHR, textStatus, errorThrown) {
+						alertMessage = "";
+						if (jqXHR.status == 403) {
+							alertMessage = "This operation is not allowed"
+						} // if
+						else {
+							alertMessage = "There is something wrong with backend, please try again later."
+						} // else
+						NANESPACE_QA_SESSION.addSessionAlert("FAILURE",
+								alertMessage);
+					}
+				});
+		
+		$
+		.ajax({
+			type : 'GET',
+			url : 'rest/qasession/' + qasessionId + "/question/"
+					+ questionId,
+			contentType : 'application/json',
+			dataType : 'json',
+			success : function(question) {
+				NANESPACE_QA_SESSION.showQuestion(question);
+				NANESPACE_QA_SESSION.addSessionAlert("SUCCESS",
+						"The answer is saved now.");
+			},
+			error : function(jqXHR, textStatus, errorThrown) {
+				alertMessage = "";
+				if (jqXHR.status == 403) {
+					alertMessage = "This operation is not allowed"
+				} // if
+				else {
+					alertMessage = "There is something wrong with backend, please try again later."
+				} // else
+				NANESPACE_QA_SESSION.addSessionAlert("FAILURE",
+						alertMessage);
+			}
+		});
+	},
+	cancelNewAnswer : function(questionId) {
+		$("#divNewAnswer_" + questionId).hide();
+		$("#textareaNewAnswer_" + questionId).val("");
+		$("#ahrefCreateAnswer_" + questionId).show();
+	},
+	editAnswer : function(answerId) {
+		$("#divShowAnswer_" + answerId).hide();
+		$("#divEditAnswer_" + answerId).show();
+
+		$("#ahrefEditAnswer_" + answerId).hide();
+		$("#ahrefCancelEditAnswer_" + answerId).show();
+		$("#ahrefSaveAnswer_" + answerId).show();
+
+	},
+	cancelEditAnswer : function(answerId) {
+
+		$("#divEditAnswer_" + answerId).hide();
+		$("#divShowAnswer_" + answerId).show();
+
+		$("#ahrefEditAnswer_" + answerId).show();
+		$("#ahrefCancelEditAnswer_" + answerId).hide();
+		$("#ahrefSaveAnswer_" + answerId).hide();
+	},
+	deleteAnswer : function(qasessionId, questionId, answerId) {
 
 		$
 				.ajax({
 					type : 'DELETE',
 					url : 'rest/qasession/' + qasessionId + "/question/"
-							+ questionId,
+							+ questionId + '/answer/' + answerId,
 					contentType : 'application/json',
 					dataType : 'json',
 					success : function(data) {
-						$("#divQuestion_" + questionId).remove();
+						$("#divAnswer_" + questionId).remove();
 
 						NANESPACE_QA_SESSION.addSessionAlert("SUCCESS",
 								"The question is removed now.");

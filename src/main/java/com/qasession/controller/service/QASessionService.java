@@ -24,7 +24,7 @@ import com.qasession.controller.dao.QASessionDao;
 import com.qasession.controller.dao.UserTranslateDao;
 import com.qasession.controller.model.Attendee;
 import com.qasession.controller.model.QASession;
-import com.qasession.controller.security.FacebookClient;
+import com.qasession.controller.model.UserTranslate;
 import com.qasession.controller.security.UserInfo;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;
@@ -47,17 +47,17 @@ public class QASessionService {
 
 	@GET
 	@Path("/")
-	@ApiOperation(value = "Find session by session ID", notes = "Return the session record that this session belong")
+	@ApiOperation(value = "Get all qasessions belong to current", response = QASession.class, responseContainer = "List", notes = "Return the session record that this session belong")
 	@ApiResponses(value = {
-			@ApiResponse(code = 404, message = "Session ID not found"),
+			@ApiResponse(code = 200, message = "List of qasessions belong to the user"),
 			@ApiResponse(code = 403, message = "Not authorized") })
 	public Response getSession(@Context HttpServletRequest pHttpServletRequest) {
 		try {
-			
-			UserInfo lUserInfo = (UserInfo) pHttpServletRequest.getSession()
-					.getAttribute(FacebookClient.getUserInfoSessionId());
-			
-			List <QASession> lQASession = mQASessionDao.getQASessionByUserId(lUserInfo.getUserId());
+			UserInfo lUserInfo = mUserTranslateDao
+					.getUserInfo(pHttpServletRequest);
+
+			List<QASession> lQASession = mQASessionDao
+					.getQASessionByUserId(lUserInfo.getUserId());
 
 			if (lQASession != null) {
 				return Response.ok().entity(lQASession).build();
@@ -71,11 +71,11 @@ public class QASessionService {
 			return Response.serverError().build();
 		} // catch
 	} // Session getSessionById
-	
+
 	@GET
 	@Path("/{qasessionId}")
-	@ApiOperation(value = "Find session by session ID", notes = "Return the session record that this session belong")
-	@ApiResponses(value = {
+	@ApiOperation(value = "Find session by session ID", response = QASession.class, notes = "Return the session record that this session belong")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Session find"),
 			@ApiResponse(code = 404, message = "Session ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
 	public Response getSessionById(@PathParam("qasessionId") String pQASessionId) {
@@ -98,13 +98,14 @@ public class QASessionService {
 	@POST
 	@Consumes("application/json")
 	@Path("/")
-	@ApiOperation(value = "Create a session", notes = "Create a session")
-	@ApiResponses(value = { @ApiResponse(code = 403, message = "Not authorized") })
+	@ApiOperation(value = "Create a session", response = QASession.class,  notes = "Create a session")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Operation Success"),
+			@ApiResponse(code = 403, message = "Not authorized") })
 	public Response createSession(QASession pSession,
 			@Context HttpServletRequest pHttpServletRequest) {
 		try {
-			UserInfo lUserInfo = (UserInfo) pHttpServletRequest.getSession()
-					.getAttribute(FacebookClient.getUserInfoSessionId());
+			UserInfo lUserInfo = mUserTranslateDao
+					.getUserInfo(pHttpServletRequest);
 
 			pSession.setCreatedBy(lUserInfo.getUserId());
 			pSession.setUpdatedBy(lUserInfo.getUserId());
@@ -125,7 +126,6 @@ public class QASessionService {
 					.ok()
 					.entity(mQASessionDao.getQASessionById(newSession
 							.getQASessionId())).build();
-
 		} // try
 		catch (Exception pExeception) {
 			LOGGER.error("Error in response", pExeception);
@@ -136,40 +136,47 @@ public class QASessionService {
 	@PUT
 	@Consumes("application/json")
 	@Path("/{qasessionId}")
-	@ApiOperation(value = "Update a session", notes = "Update the session record that this session belong")
+	@ApiOperation(value = "Update a session", response = QASession.class, notes = "Update the session record that this session belong")
 	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Operation Success"),
 			@ApiResponse(code = 404, message = "Session ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
 	public Response updateSessionById(
-			@PathParam("qasessionId") String pQASessionId, QASession pQASession,
+			@PathParam("qasessionId") String pQASessionId,
+			QASession pQASession,
 			@Context HttpServletRequest pHttpServletRequest) {
 		try {
 
-			UserInfo lUserInfo = (UserInfo) pHttpServletRequest.getSession()
-					.getAttribute(FacebookClient.getUserInfoSessionId());
+			UserInfo lUserInfo = mUserTranslateDao
+					.getUserInfo(pHttpServletRequest);
+
 			Attendee lAttendee = mAttendeeDao.getAttendeeByQASessionIdUserId(
 					pQASessionId, lUserInfo.getUserId());
 
-		    QASession lQASession = mQASessionDao.getQASessionById(pQASessionId);
-		    
-		    if (lQASession == null) {
-		    	return Response.status(Response.Status.NOT_FOUND).build();
+			QASession lQASession = mQASessionDao.getQASessionById(pQASessionId);
+
+			if (lQASession == null) {
+				return Response.status(Response.Status.NOT_FOUND).build();
 			}
-		    
-			if (lUserInfo.getUserRole().equals("ADMIN") || 
-					(lAttendee != null && lAttendee.getQASessionRole().equals("HOST"))) {
-				
+
+			if (lUserInfo.getUserRole().equals("ADMIN")
+					|| (lAttendee != null && lAttendee.getQASessionRole()
+							.equals("HOST"))) {
+
 				lQASession.setAttendees(pQASession.getAttendees());
 				lQASession.setUpdatedBy(lUserInfo.getUserId());
-				lQASession.setQASessionDescription(pQASession.getQASessionDescription());
-				lQASession.setQASessionMaxQuestion(pQASession.getQASessionMaxQuestion());
+				lQASession.setQASessionDescription(pQASession
+						.getQASessionDescription());
+				lQASession.setQASessionMaxQuestion(pQASession
+						.getQASessionMaxQuestion());
 				lQASession.setQASessionStatus(pQASession.getQASessionStatus());
 				lQASession.setQASessionTopic(pQASession.getQASessionTopic());
-				
-				return Response.ok().entity(mQASessionDao.updateQASession(lQASession))
+
+				return Response.ok()
+						.entity(mQASessionDao.updateQASession(lQASession))
 						.build();
 			} // if
-			
+
 			return Response
 					.status(Response.Status.FORBIDDEN)
 					.entity("{\"status\":\"forbidden\", \"message\":\"user does not have the previliege to perform the particular action\"}")
@@ -185,20 +192,22 @@ public class QASessionService {
 	@Path("/{qasessionId}")
 	@ApiOperation(value = "Delete a session by session id", notes = "Delete a session by session id")
 	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Operation Success"),
 			@ApiResponse(code = 404, message = "Session ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
 	public Response deleteSessionById(
 			@PathParam("qasessionId") String pQASessionId,
 			@Context HttpServletRequest pHttpServletRequest) {
 		try {
+			UserInfo lUserInfo = mUserTranslateDao
+					.getUserInfo(pHttpServletRequest);
 
-			UserInfo lUserInfo = (UserInfo) pHttpServletRequest.getSession()
-					.getAttribute(FacebookClient.getUserInfoSessionId());
 			Attendee lAttendee = mAttendeeDao.getAttendeeByQASessionIdUserId(
 					pQASessionId, lUserInfo.getUserId());
-			
-			if (lUserInfo.getUserRole().equals("ADMIN") || 
-					(lAttendee != null && lAttendee.getQASessionRole().equals("HOST"))) {
+
+			if (lUserInfo.getUserRole().equals("ADMIN")
+					|| (lAttendee != null && lAttendee.getQASessionRole()
+							.equals("HOST"))) {
 				mQASessionDao.deleteQASessionById(pQASessionId);
 				return Response.ok().entity("{\"status\":\"ok\"}").build();
 			} // if

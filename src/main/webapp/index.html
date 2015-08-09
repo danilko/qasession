@@ -99,6 +99,7 @@
 		<!-- div #divSessionDetail -->
 		<div id="divSessionDetail">
 
+            <div id="divSessionDetailAdministrations">
 			<div>
 				<div class="text-right">
 					<button type="button" class="btn btn-default"
@@ -130,10 +131,11 @@
 					</div>
 					<div class="form-group">
 						<label for="existSessionSessionMaxQuestion">Max Numbers of
-							Question Per Attendee:</label> <input type="text" class="form-control"
-							id="existSessionSessionMaxQuestion" placeholder="1">
+							Question Per Attendee:</label> <input type="number" class="form-control"
+							id="existSessionSessionMaxQuestion" value="1">
 					</div>
 				</form>
+			</div>
 			</div>
 			<hr>
 			<div id="divSessionDetailQuestions"></div>
@@ -142,7 +144,7 @@
 				<form role="form">
 					<div class="form-group">
 						<label for="sessionQuestionContent">New Question:</label>
-						<textarea class="form-control" rows="10"
+						<textarea class="form-control" rows="5"
 							id="sessionQuestionContent" placeholder="Enter question content"></textarea>
 					</div>
 				</form>
@@ -190,8 +192,8 @@
 							</div>
 							<div class="form-group">
 								<label for="sessionMaxQuestion">Max Numbers of Question
-									Per Attendee:</label> <input type="text" class="form-control"
-									id="sessionMaxQuestion" placeholder="1">
+									Per Attendee:</label> <input type="number" class="form-control"
+									id="sessionMaxQuestion" value="1">
 							</div>
 						</form>
 					</div>

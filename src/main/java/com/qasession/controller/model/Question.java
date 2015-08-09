@@ -1,7 +1,9 @@
 package com.qasession.controller.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -9,7 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -42,19 +44,19 @@ public class Question implements Serializable
 	@Column(name = "question_content") 
 	private String questionContent;
 	
-	@OneToOne(cascade = CascadeType.ALL, orphanRemoval=true, fetch=FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval=true, fetch=FetchType.EAGER)
 	@JoinColumn(name="question_id")
-	private Answer answer;
+	private List<Answer> answers = new ArrayList<Answer>(0);
 	
 	@Column(name = "question_status") 
 	private String questionStatus;
 	
-	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd,HH:00", timezone="UTC")
+	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd,HH:mm", timezone="UTC")
 	@Column(name = "create_timestamp", nullable = false)  
 	@Temporal(TemporalType.TIMESTAMP) 
     private Calendar createTimestamp;
 	
-	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd,HH:00", timezone="UTC")
+	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd,HH:mm", timezone="UTC")
 	@Column(name = "update_timestamp", nullable = false)  
 	@Temporal(TemporalType.TIMESTAMP) 
     private Calendar updateTimestamp;
@@ -81,12 +83,12 @@ public class Question implements Serializable
 		this.questionContent = questionContent;
 	}  // void setQuestionContent
 
-	public Answer getAnswer() {
-		return answer;
-	}  // Answer getAnswer
+	public List<Answer> getAnswers() {
+		return answers;
+	}  // Answer getAnswers
 
-	public void setAnswer(Answer answer) {
-		this.answer = answer;
+	public void setAnswers(List <Answer> answers) {
+		this.answers = answers;
 	}  // void setAnswer
 
     

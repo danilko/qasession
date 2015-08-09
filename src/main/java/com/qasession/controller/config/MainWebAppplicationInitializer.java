@@ -13,8 +13,6 @@ import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
-import com.wordnik.swagger.jaxrs.config.DefaultJaxrsConfig;
-
 
 public class MainWebAppplicationInitializer implements
 		WebApplicationInitializer {
