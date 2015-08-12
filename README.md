@@ -33,7 +33,6 @@ Purposed by Kent Huang
 TODO
 ===============
 Complete Frontend for Attendee/Question/Session modifications
-Clean up backend codes
 Integration/Unit Tests
 
 Build Instruction
@@ -117,5 +116,13 @@ export OAUTH_REDUCT_URI="http://localhost:8080/controller/OAuthConsumerResponseC
 export APP_ADMIN_OAUTH_IDENTITIY_ID_LIST="<FB_IDENTITY_ID_1>,<FB_IDENTITY_ID_2>"
 
 mvn clean tomcat:run - DskipTests
+```
+
+Swagger API Documentation
+===============
+
+API documentation can be found at
+```
+http://<hostname>/controller/api
 ```
 
