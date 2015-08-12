@@ -51,9 +51,12 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 
+@ApiModel
 @Entity
-@Table(name="attendee")
+@Table(name="Attendee")
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="attendeeId")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -85,6 +88,7 @@ public class Attendee implements Serializable
 	@Temporal(TemporalType.TIMESTAMP) 
     private Calendar createTimestamp;
 	
+	@ApiModelProperty(value = "Attendee Id", required = false)
 	public String getAttendeeId() {
 		return attendeeId;
 	}
@@ -93,6 +97,7 @@ public class Attendee implements Serializable
 		this.attendeeId = attendeeId;
 	}
 	
+	@ApiModelProperty(value = "QASession Id", required = false)
 	public String getQASessionId() {
 		return qasessionId;
 	}
@@ -101,6 +106,7 @@ public class Attendee implements Serializable
 		this.qasessionId = sessionId;
 	}
 
+	@ApiModelProperty(value = "Timestamp of creation", required = false)
 	public Calendar getCreateTimestamp() {
 		return createTimestamp;
 	}
@@ -108,7 +114,7 @@ public class Attendee implements Serializable
 	public void setCreateTimestamp(Calendar createTimestamp) {
 		this.createTimestamp = createTimestamp;
 	}
-
+	@ApiModelProperty(value = "Attendee Role (ATTENDEE, HOST)", required = true)
 	public String getQASessionRole() {
 		return qasessionRole;
 	}  // String getSessionRole
@@ -117,6 +123,7 @@ public class Attendee implements Serializable
 		this.qasessionRole = qasessionRole;
 	}  // void setSessionRole
 	
+	@ApiModelProperty(value = "QASession User Id of the attendee", required = true)
 	public String getUserId() {
 		return userId;
 	}  // String getUserId
@@ -125,6 +132,7 @@ public class Attendee implements Serializable
 		this.userId = userId;
 	}  // void setUserId
 
+	@ApiModelProperty(value = "Timestamp of last modification", required = false)
 	public Calendar getUpdateTimestamp() {
 		return updateTimestamp;
 	}  // Calendar getUpdateTimestamp

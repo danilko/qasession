@@ -51,10 +51,12 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 
-
+@ApiModel
 @Entity
-@Table(name="answer")
+@Table(name="Answer")
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="answerId")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -92,6 +94,7 @@ public class Answer implements Serializable
 	@Temporal(TemporalType.TIMESTAMP) 
     private Calendar createTimestamp;
 	
+    @ApiModelProperty(value = "Question Id", required = false)
     public String getQuestionId() {
 		return questionId;
 	}
@@ -100,6 +103,7 @@ public class Answer implements Serializable
 		this.questionId = questionId;
 	}
 
+	@ApiModelProperty(value = "Answer Id", required = false)
 	public String getAnswerId() {
 		return answerId;
 	}  // String getAnswerId
@@ -108,6 +112,7 @@ public class Answer implements Serializable
 		this.answerId = answerId;
 	}  // void setAnswerId
 	
+	@ApiModelProperty(value = "Timestamp of last modification", required = false)
 	public Calendar getUpdateTimestamp() {
 		return updateTimestamp;
 	}  // Date getUpdateTimestamp
@@ -116,6 +121,7 @@ public class Answer implements Serializable
 		this.updateTimestamp = updateTimestamp;
 	}  // void setUpdateDate
 
+	@ApiModelProperty(value = "Answer Content", required = true)
 	public String getAnswerContent() {
 		return answerContent;
 	}  // String getAnswerContent
@@ -124,7 +130,7 @@ public class Answer implements Serializable
 		this.answerContent = answerContent;
 	}  // void setAnswerContent
 	
-    
+	@ApiModelProperty(value = "User Id for the original author of the answer", required = false)
 	public String getCreatedBy() {
 		return createdBy;
 	}
@@ -133,6 +139,7 @@ public class Answer implements Serializable
 		this.createdBy = createdBy;
 	}
 
+	@ApiModelProperty(value = "User Id for the author that performs the last modification", required = false)
 	public String getUpdatedBy() {
 		return updatedBy;
 	}
@@ -141,6 +148,7 @@ public class Answer implements Serializable
 		this.updatedBy = updatedBy;
 	}
 
+	@ApiModelProperty(value = "Timestamp of creation", required = false)
 	public Calendar getCreateTimestamp() {
 		return createTimestamp;
 	}

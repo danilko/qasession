@@ -51,13 +51,17 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 
 /**
  * @author danilko
  *
  */
+
+@ApiModel
 @Entity
-@Table(name="usertranslate")
+@Table(name="UserTranslate")
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userId")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -97,6 +101,7 @@ public class UserTranslate implements Serializable{
 	@Temporal(TemporalType.TIMESTAMP) 
     private Calendar createTimestamp;
 	
+	@ApiModelProperty(value = "Timestamp of last modification", required = false)
 	public Calendar getUpdateTimestamp() {
 		return updateTimestamp;
 	}
@@ -105,6 +110,7 @@ public class UserTranslate implements Serializable{
 		this.updateTimestamp = updateTimestamp;
 	}
 
+	@ApiModelProperty(value = "Timestamp of last creation", required = false)
 	public Calendar getCreateTimestamp() {
 		return createTimestamp;
 	}
@@ -113,6 +119,7 @@ public class UserTranslate implements Serializable{
 		this.createTimestamp = createTimestamp;
 	}
 
+	@ApiModelProperty(value = "User Id of the user", required = true)
 	public String getUserId() {
 		return userId;
 	}
@@ -121,6 +128,7 @@ public class UserTranslate implements Serializable{
 		this.userId = userId;
 	}
 
+	@ApiModelProperty(value = "Facebook User Id for the user (if the login type is FACEBOOK)", required = false)
 	public String getFacebookUserId() {
 		return facebookUserId;
 	}
@@ -129,6 +137,7 @@ public class UserTranslate implements Serializable{
 		this.facebookUserId = facebookUserId;
 	}
 
+	@ApiModelProperty(value = "Google User Id for the user (if the login type is GOOGLE)", required = false)
 	public String getGoogleUserId() {
 		return googleUserId;
 	}
@@ -137,6 +146,7 @@ public class UserTranslate implements Serializable{
 		this.googleUserId = googleUserId;
 	}
 	
+	@ApiModelProperty(value = "Twitter User Id for the user (if the login type is TWITTER)", required = false)
 	public String getTwitterUserId() {
 		return twitterUserId;
 	}
@@ -145,6 +155,7 @@ public class UserTranslate implements Serializable{
 		this.twitterUserId = twitterUserId;
 	}
 	
+	@ApiModelProperty(value = "Preffered name for the User", required = true)
 	public String getName() {
 		return name;
 	}
@@ -153,6 +164,7 @@ public class UserTranslate implements Serializable{
 		this.name = name;
 	}
 	
+	@ApiModelProperty(value = "Single Sign On Type (SSO) for the user (FACEBOOK, TWITTER, GOOGLE)", required = true)
 	public String getLoginUserIdType() {
 		return loginUserIdType;
 	}

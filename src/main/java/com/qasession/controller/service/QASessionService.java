@@ -61,10 +61,12 @@ import com.qasession.controller.dao.UserTranslateDao;
 import com.qasession.controller.model.Attendee;
 import com.qasession.controller.model.QASession;
 import com.qasession.controller.security.UserInfo;
+import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 
+@Api(value = "QASession Service", description = "manage qasessions")
 @Produces("application/json")
 @Path("/qasession")
 public class QASessionService {

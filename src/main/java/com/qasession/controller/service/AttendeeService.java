@@ -57,10 +57,12 @@ import com.qasession.controller.model.Attendee;
 import com.qasession.controller.model.QASession;
 import com.qasession.controller.security.FacebookClient;
 import com.qasession.controller.security.UserInfo;
+import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponses;
 import com.wordnik.swagger.annotations.ApiResponse;
 
+@Api(value="Attendee Service", description = "manage attendees")
 @Produces("application/json")
 @Path("/qasession/{qasessionId}/attendee")
 public class AttendeeService {

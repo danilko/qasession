@@ -57,9 +57,12 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 
+@ApiModel
 @Entity
-@Table(name="qasession")
+@Table(name="Qasession")
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="qasessionId")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -110,6 +113,7 @@ public class QASession implements Serializable
 	@Temporal(TemporalType.TIMESTAMP) 
     private Calendar createTimestamp;
 	
+	@ApiModelProperty(value = "QASession Id")
 	public String getQASessionId()
 	{
 		return qasessionId;
@@ -119,10 +123,12 @@ public class QASession implements Serializable
 		return qasessionStatus;
 	}
 
+	@ApiModelProperty(value = "QASession Status", required = true)
 	public void setQASessionStatus(String qasessionStatus) {
 		this.qasessionStatus = qasessionStatus;
 	}
 
+	@ApiModelProperty(value = "Timestamp of last modification", required = false)
 	public Calendar getUpdateTimestamp() {
 		return updateTimestamp;
 	}  // Date getUpdateTimestamp
@@ -131,6 +137,7 @@ public class QASession implements Serializable
 		this.updateTimestamp = updateTimestamp;
 	}  // void setUpdateDate
     
+	@ApiModelProperty(value = "User Id for the original author", required = false)
 	public String getCreatedBy() {
 		return createdBy;
 	}
@@ -139,6 +146,7 @@ public class QASession implements Serializable
 		this.createdBy = createdBy;
 	}
 
+	@ApiModelProperty(value = "User Id for the author of the last modification", required = false)
 	public String getUpdatedBy() {
 		return updatedBy;
 	}
@@ -147,6 +155,7 @@ public class QASession implements Serializable
 		this.updatedBy = updatedBy;
 	}
 
+	@ApiModelProperty(value = "Timestamp of creation", required = false)
 	public Calendar getCreateTimestamp() {
 		return createTimestamp;
 	}
@@ -159,6 +168,7 @@ public class QASession implements Serializable
 		qasessionId = pQASessionId;
 	}  // void getSessionId
 	
+	@ApiModelProperty(value = "QASession Topic", required = true)
 	public String getQASessionTopic()
 	{
 		return qasessionTopic;
@@ -169,6 +179,7 @@ public class QASession implements Serializable
 		qasessionTopic = pQASessionTopic;
 	}  // void getSessionTopic
 	
+	@ApiModelProperty(value = "QASession Description", required = true)
 	public String getQASessionDescription()
 	{
 		return qasessionDescription;
@@ -179,6 +190,7 @@ public class QASession implements Serializable
 		qasessionDescription = pQASessionDescription;
 	}  // void getSessionDescription
 	
+	@ApiModelProperty(value = "List of QASession questions", required = false)
 	public List <Question> getQuestions()
 	{
 		return questions;
@@ -188,6 +200,7 @@ public class QASession implements Serializable
 		this.questions = questions;
 	}
 	
+	@ApiModelProperty(value = "List of QASession attendees", required = false)
 	public List <Attendee> getAttendees()
 	{
 		return attendees;
@@ -198,6 +211,7 @@ public class QASession implements Serializable
 		attendees = pASttendees;
 	}  // void setAttendees(List <Attendee> pASttendees)
 	
+	@ApiModelProperty(value = "QASession maximum question", required = true)
 	public Integer getQASessionMaxQuestion() {
 		return qasessionMaxQuestion;
 	}

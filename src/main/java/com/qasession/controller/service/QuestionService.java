@@ -60,10 +60,12 @@ import com.qasession.controller.model.Attendee;
 import com.qasession.controller.model.Question;
 import com.qasession.controller.model.QASession;
 import com.qasession.controller.security.UserInfo;
+import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponses;
 import com.wordnik.swagger.annotations.ApiResponse;
 
+@Api(value = "Question Service", description = "manage questions")
 @Produces("application/json")
 @Path("/qasession/{qasessionId}/question")
 public class QuestionService {

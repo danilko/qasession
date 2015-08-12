@@ -44,6 +44,7 @@ import javax.ws.rs.ext.RuntimeDelegate;
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -54,6 +55,9 @@ import com.qasession.controller.service.QuestionService;
 import com.qasession.controller.service.QASessionService;
 import com.qasession.controller.service.UserService;
 import com.wordnik.swagger.jaxrs.config.BeanConfig;
+import com.wordnik.swagger.jaxrs.listing.ApiDeclarationProvider;
+import com.wordnik.swagger.jaxrs.listing.ApiListingResourceJSON;
+import com.wordnik.swagger.jaxrs.listing.ResourceListingProvider;
 
 @Configuration
 public class ApplicationConfig {
@@ -106,23 +110,41 @@ public class ApplicationConfig {
 	public BeanConfig getSwaggerService()
 	{
         BeanConfig beanConfig = new BeanConfig();
-        beanConfig.setVersion("1.0.2");
-        beanConfig.setBasePath("http://localhost:8080/controller/api");
-        beanConfig.setResourcePackage("io.swagger.resources");
+        beanConfig.setVersion("1.0.0");
+        beanConfig.setBasePath("/controller/rest");
+        beanConfig.setResourcePackage("com.qasession.controller.service");
         beanConfig.setScan(true);
         
         return beanConfig;
 	}  // public UserService getUserService()
 
 	@Bean
+	public ApiDeclarationProvider getApiDeclarationProivder()
+	{
+		return new ApiDeclarationProvider();
+	}  // public ApiDeclarationProvider getApiDeclarationProivder
+	
+	@Bean
+	public ApiListingResourceJSON getApiListingResourceJSON()
+	{
+		return new ApiListingResourceJSON();
+	}  // public ApiListResoureJSON getApiListingResourceJSON
+	
+	@Bean
+	public ResourceListingProvider getResourceListingProvider()
+	{
+		return new ResourceListingProvider();
+	}  // public ApiListResoureJSON getApiListResoureJSON
+	
+	@Bean
 	public Server initJAXRSServer() {
 		JAXRSServerFactoryBean lFactory = RuntimeDelegate.getInstance().createEndpoint(new Application(),
 				JAXRSServerFactoryBean.class);
-		lFactory.setServiceBeans(Arrays.<Object>asList(getSessionService(), getAnswerService(), getQuestionService(), getAttendeeService(), getUserService()));
+		lFactory.setServiceBeans(Arrays.<Object>asList(getSessionService(), getAnswerService(), getQuestionService(), getAttendeeService(), getUserService(), getApiListingResourceJSON()));
 		
 		lFactory.setAddress(lFactory.getAddress());
 	
-		lFactory.setProviders(Arrays.<Object>asList(getJSONProvider()));
+		lFactory.setProviders(Arrays.<Object>asList(getJSONProvider(),  getResourceListingProvider(), getApiDeclarationProivder() ));
 		
 		return lFactory.create();
 	}  // Server initJAXRSServer

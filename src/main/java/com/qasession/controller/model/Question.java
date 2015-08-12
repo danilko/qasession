@@ -57,9 +57,12 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 
+@ApiModel
 @Entity
-@Table(name="question")
+@Table(name="Question")
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="questionId")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -103,6 +106,7 @@ public class Question implements Serializable
 	@Column(name = "updated_by") 
     private String updatedBy;
 	
+	@ApiModelProperty(value = "Question Id", required = false)
 	public String getQuestionId() {
 		return questionId;
 	}  // String getQuestionId
@@ -111,6 +115,7 @@ public class Question implements Serializable
 		this.questionId = questionId;
 	}  // void setQuestionId
 
+	@ApiModelProperty(value = "Question Content", required = true)
 	public String getQuestionContent() {
 		return questionContent;
 	}  // String getQuestionContent
@@ -119,6 +124,7 @@ public class Question implements Serializable
 		this.questionContent = questionContent;
 	}  // void setQuestionContent
 
+	@ApiModelProperty(value = "List of questions belong to the answer", required = false)
 	public List<Answer> getAnswers() {
 		return answers;
 	}  // Answer getAnswers
@@ -127,7 +133,7 @@ public class Question implements Serializable
 		this.answers = answers;
 	}  // void setAnswer
 
-    
+	@ApiModelProperty(value = "User Id for the original author", required = false)
 	public String getCreatedBy() {
 		return createdBy;
 	}
@@ -136,6 +142,7 @@ public class Question implements Serializable
 		this.createdBy = createdBy;
 	}
 
+	@ApiModelProperty(value = "User Id for the author that performs the last modification", required = false)
 	public String getUpdatedBy() {
 		return updatedBy;
 	}
@@ -143,7 +150,8 @@ public class Question implements Serializable
 	public void setUpdatedBy(String updatedBy) {
 		this.updatedBy = updatedBy;
 	}
-
+	
+	@ApiModelProperty(value = "Timestamp of creation", required = false)
 	public Calendar getCreateTimestamp() {
 		return createTimestamp;
 	}
@@ -152,6 +160,7 @@ public class Question implements Serializable
 		this.createTimestamp = createTimestamp;
 	}
 
+	@ApiModelProperty(value = "Question Status (OPEN, CLOSE)", required = true)
 	public String getQuestionStatus() {
 		return questionStatus;
 	}  // String getQuestionStatus
@@ -160,6 +169,7 @@ public class Question implements Serializable
 		this.questionStatus = questionStatus;
 	}  // void setQuestionStatus
 	
+	@ApiModelProperty(value = "Timestamp of last modification", required = false)
 	public Calendar getUpdateTimestamp() {
 		return updateTimestamp;
 	}
@@ -168,6 +178,7 @@ public class Question implements Serializable
 		this.updateTimestamp = updateTimestamp;
 	}
 
+	@ApiModelProperty(value = "QASession Id", required = false)
 	public String getQASessionId() {
 		return qasessionId;
 	}

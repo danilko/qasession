@@ -50,10 +50,12 @@ import org.slf4j.LoggerFactory;
 import com.qasession.controller.dao.UserTranslateDao;
 import com.qasession.controller.model.UserTranslate;
 import com.qasession.controller.security.UserInfo;
+import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 
+@Api(value = "User Service", description = "manage current user info")
 @Produces("application/json")
 @Path("/user")
 public class UserService {

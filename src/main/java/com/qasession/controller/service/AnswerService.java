@@ -61,10 +61,13 @@ import com.qasession.controller.model.Answer;
 import com.qasession.controller.model.Attendee;
 import com.qasession.controller.model.QASession;
 import com.qasession.controller.security.UserInfo;
+import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponses;
 import com.wordnik.swagger.annotations.ApiResponse;
 
+@Api(value="Answer Service", description = "manage answers")
 @Produces("application/json")
 @Path("/qasession/{qasessionId}/question/{questionId}/answer")
 public class AnswerService {
@@ -88,9 +91,10 @@ public class AnswerService {
 			@ApiResponse(code = 404, message = "Answer object for the Answer ID"),
 			@ApiResponse(code = 404, message = "Answer ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
-	public Response getAnswer(@PathParam("qasessionId") String pQASessionId,
-			@PathParam("questionId") String pQuestionId,
-			@PathParam("answerId") String pAnswerId) {
+	public Response getAnswer(
+			@ApiParam(value = "qasession that contains the answer", required = true) @PathParam("qasessionId") String pQASessionId,
+			@ApiParam(value = "question that contains the answer", required = true) @PathParam("questionId") String pQuestionId,
+			@ApiParam(value = "answer that need to be retrieved", required = true) @PathParam("answerId") String pAnswerId) {
 		try {
             
             Answer lAnswer = mAnswerDao.getAnswerById(pAnswerId);
@@ -118,9 +122,10 @@ public class AnswerService {
 			@ApiResponse(code = 200, message = "Update answer by answer ID operation success"),
 			@ApiResponse(code = 404, message = "Answer ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
-	public Response updateAnswer(@PathParam("qasessionId") String pQASessionId,
-			@PathParam("questionId") String pQuestionId,
-			@PathParam("answerId") String pAnswerId, Answer pAnswer,
+	public Response updateAnswer(
+			@ApiParam(value = "qasession that contains the answer", required = true) @PathParam("qasessionId") String pQASessionId,
+			@ApiParam(value = "question that contains the answer", required = true) @PathParam("questionId") String pQuestionId,
+			@ApiParam(value = "answer that need to be updated", required = true) @PathParam("answerId") String pAnswerId, Answer pAnswer,
 			@Context HttpServletRequest pHttpServletRequest) {
 		try {
 
@@ -168,8 +173,10 @@ public class AnswerService {
 			@ApiResponse(code = 200, message = "Create answer by questionID operation success"),
 			@ApiResponse(code = 404, message = "Question ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
-	public Response createAnswer(@PathParam("qasessionId") String pQASessionId,
-			@PathParam("questionId") String pQuestionId, Answer pAnswer,
+	public Response createAnswer(
+			@ApiParam(value = "qasession that contains the answer", required = true) @PathParam("qasessionId") String pQASessionId,
+			@ApiParam(value = "question that contains the answer", required = true) @PathParam("questionId") String pQuestionId, 
+			@ApiParam(value = "answer that need to be retrieved", required = true) Answer pAnswer,
 			@Context HttpServletRequest pHttpServletRequest) {
 		try {
 
@@ -207,8 +214,9 @@ public class AnswerService {
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Deleate an answer by answer ID operation success"),
 			@ApiResponse(code = 403, message = "Not authorized") })
-	public Response deleteAnswer(@PathParam("qasessionId") String pQASessionId,
-			@PathParam("questionId") String pQuestionId,
+	public Response deleteAnswer(
+			@ApiParam(value = "qasession that contains the answer", required = true) @PathParam("qasessionId") String pQASessionId,
+			@ApiParam(value = "question that contains the answer", required = true) @PathParam("questionId") String pQuestionId,
 			@PathParam("answerId") String pAnswerId,
 			@Context HttpServletRequest pHttpServletRequest) {
 		try {
