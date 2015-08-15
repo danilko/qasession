@@ -86,14 +86,14 @@ LC_ALL Detail Descriptions
 http://www.jvmhost.com/articles/locale-breaks-unicode-utf-8-java-tomcat
 
 ```
-export CONTAINER=$(docker run -p 127.0.0.1:5432:5432 -d stackbrew/postgres:latest)
-export CONTAINER_IP=$(docker inspect $CONTAINER | grep IPAddress | awk '{ print $2 }' | tr -d ',"')
+export CONTAINER=$(docker run -p 127.0.0.1:5432:5432 -d stackbrew/postgres:latest);
+export CONTAINER_IP=$(docker inspect $CONTAINER | grep IPAddress | awk '{ print $2 }' | tr -d ',"');
 
+sleep 30;
 
 docker exec -i postgresql bash -c 'cat > /tmp/file' < sql_scripts/postgresql_ods.sql;
 docker exec -i postgresql bash -c 'export PGPASSWORD=postgres; psql -U postgres < /tmp/file';
 
-sleep 30;
 
 export JDBC_DRIVERCLASSNAME="org.postgresql.Driver"
 export JDBC_MAXCONNECTIONPERPARTITION="2"
