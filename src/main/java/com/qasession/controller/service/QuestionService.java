@@ -136,6 +136,15 @@ public class QuestionService {
 							|| !lAttendee.getQASessionRole().equals("HOST") || !mQASessionDao
 							.getQASessionById(pQASessionId).equals("OPEN"))) {
 
+				if(lQuestion.getQuestionStatus().equalsIgnoreCase("OPEN"))
+				{
+					lQuestion.setQuestionStatus("OPEN");
+				}  // if
+				else
+				{
+					lQuestion.setQuestionStatus("CLOSE");
+				}  // else
+				
 				lQuestion.setQuestionStatus(pQuestion.getQuestionStatus());
 				lQuestion.setQuestionContent(pQuestion.getQuestionContent());
 				lQuestion.setUpdatedBy(lUserInfo.getUserId());
@@ -200,6 +209,15 @@ public class QuestionService {
 			pQuestion.setUpdatedBy(lUserInfo.getUserId());
 			pQuestion.setQASessionId(lSession.getQASessionId());
 
+			if(pQuestion.getQuestionStatus().equalsIgnoreCase("OPEN"))
+			{
+				pQuestion.setQuestionStatus("OPEN");
+			}  // if
+			else
+			{
+				pQuestion.setQuestionStatus("CLOSE");
+			}  // else
+			
 			return Response.ok().entity(mQuestionDao.createQuestion(pQuestion))
 					.build();
 		} // try

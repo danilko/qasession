@@ -149,7 +149,6 @@ public class QASessionService {
 			
 			QASession newSession = mQASessionDao.createQASession(pSession,
 					lUserInfo.getUserId());
-
 			
 			Attendee lAttendee = new Attendee();
 			lAttendee.setQASessionId(newSession.getQASessionId());
@@ -200,15 +199,22 @@ public class QASessionService {
 					|| (lAttendee != null && lAttendee.getQASessionRole()
 							.equals("HOST"))) {
 
-				lQASession.setAttendees(pQASession.getAttendees());
 				lQASession.setUpdatedBy(lUserInfo.getUserId());
 				lQASession.setQASessionDescription(pQASession
 						.getQASessionDescription());
 				lQASession.setQASessionMaxQuestion(pQASession
 						.getQASessionMaxQuestion());
-				lQASession.setQASessionStatus(pQASession.getQASessionStatus());
 				lQASession.setQASessionTopic(pQASession.getQASessionTopic());
 
+				if(pQASession.getQASessionStatus().equalsIgnoreCase("OPEN"))
+				{
+					lQASession.setQASessionStatus("OPEN");
+				}  // if
+				else
+				{
+					lQASession.setQASessionStatus("CLOSE");
+				}  // else
+				
 				return Response.ok()
 						.entity(mQASessionDao.updateQASession(lQASession))
 						.build();

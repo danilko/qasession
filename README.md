@@ -30,14 +30,8 @@ QA Session
 Allows user to easily create an organized question and answer session.
 Purposed by Kent Huang
 
-TODO
-===============
-Complete Frontend for Attendee/Question/Session modifications
-Integration/Unit Tests
-
 Build Instruction
 ===============
-
 Git clone the repo, and perform following
 `mvn clean package - DskipTests`
 

@@ -62,7 +62,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponses;
 import com.wordnik.swagger.annotations.ApiResponse;
 
-@Api(value="Attendee Service", description = "manage attendees")
+@Api(value = "Attendee Service", description = "manage attendees")
 @Produces("application/json")
 @Path("/qasession/{qasessionId}/attendee")
 public class AttendeeService {
@@ -74,7 +74,7 @@ public class AttendeeService {
 
 	@Resource(shareable = true, name = "getQASessionDao")
 	private QASessionDao mQASessionDao;
-	
+
 	@PUT
 	@Consumes("application/json")
 	@Path("/{userId}")
@@ -84,7 +84,8 @@ public class AttendeeService {
 			@ApiResponse(code = 404, message = "Attendee ID not found"),
 			@ApiResponse(code = 403, message = "Not authorized") })
 	public Response updateSessionAttendee(
-			@PathParam("qasessionId") String pQASessionId, @PathParam("userId") String pUserId, Attendee pAttendee,
+			@PathParam("qasessionId") String pQASessionId,
+			@PathParam("userId") String pUserId, Attendee pAttendee,
 			@Context HttpServletRequest pHttpServletRequest) {
 		try {
 
@@ -94,19 +95,40 @@ public class AttendeeService {
 			Attendee lAttendee = mAttendeeDao.getAttendeeByQASessionIdUserId(
 					pQASessionId, lUserInfo.getUserId());
 
-			Attendee lTargetAttendee = mAttendeeDao.getAttendeeByQASessionIdUserId(pQASessionId, pUserId);
-			
-            QASession lQASession = mQASessionDao.getQASessionById(pQASessionId);
-			
-			if (lUserInfo.getUserRole().equals("ADMIN") || 
-					(lAttendee != null && lQASession.getQASessionStatus().equalsIgnoreCase("OPEN") && lAttendee.getQASessionRole().equals("HOST"))) {
-				
-				lTargetAttendee.setQASessionRole(pAttendee.getQASessionRole());
-				
-				return Response.ok().entity(mAttendeeDao.updateAttende(pAttendee))
-						.build();
+			Attendee lTargetAttendee = mAttendeeDao
+					.getAttendeeByQASessionIdUserId(pQASessionId, pUserId);
+
+			QASession lQASession = mQASessionDao.getQASessionById(pQASessionId);
+
+			if (lUserInfo.getUserRole().equals("ADMIN")
+					|| (lAttendee != null
+							&& lQASession.getQASessionStatus()
+									.equalsIgnoreCase("OPEN") && lAttendee
+							.getQASessionRole().equals("HOST"))) {
+
+				if (!lQASession.getCreatedBy().equalsIgnoreCase(pUserId)) {
+					lTargetAttendee.setQASessionRole(pAttendee
+							.getQASessionRole());
+
+					if(pAttendee.getQASessionRole().equalsIgnoreCase("HOST"))
+					{
+						pAttendee.setQASessionRole("HOST");
+					}  // if
+					else
+					{
+						pAttendee.setQASessionRole("ATTENDEE");
+					}  // else
+					
+					return Response.ok()
+							.entity(mAttendeeDao.updateAttende(pAttendee))
+							.build();
+				} else {
+					Response.status(Response.Status.FORBIDDEN)
+							.entity("{\"status\":\"forbidden\", \"message\":\"Original Host of the session cannot be modified/deleted\"}")
+							.build();
+				} // else
 			} // if
-			
+
 			return Response
 					.status(Response.Status.FORBIDDEN)
 					.entity("{\"status\":\"forbidden\", \"message\":\"user does not have the previliege to perform the particular action\"}")
@@ -114,7 +136,7 @@ public class AttendeeService {
 
 		} // try
 		catch (Exception pExeception) {
-            LOGGER.error("Error in response", pExeception);
+			LOGGER.error("Error in response", pExeception);
 			return Response.serverError().build();
 		} // catch
 	} // Session updateSessionAttendee
@@ -138,14 +160,36 @@ public class AttendeeService {
 			Attendee lAttendee = mAttendeeDao.getAttendeeByQASessionIdUserId(
 					pQASessionId, lUserInfo.getUserId());
 
-            QASession lQASession = mQASessionDao.getQASessionById(pQASessionId);
-			
-			if (lUserInfo.getUserRole().equals("ADMIN") || 
-					(lAttendee != null && lQASession.getQASessionStatus().equalsIgnoreCase("OPEN") && lAttendee.getQASessionRole().equals("HOST"))) {
-				pAttendee.setQASessionId(pQASessionId);
+			QASession lQASession = mQASessionDao.getQASessionById(pQASessionId);
 
-				return Response.ok().entity(mAttendeeDao.createAttendee(pAttendee))
-						.build();
+			if (lUserInfo.getUserRole().equals("ADMIN")
+					|| (lAttendee != null
+							&& lQASession.getQASessionStatus()
+									.equalsIgnoreCase("OPEN") && lAttendee
+							.getQASessionRole().equals("HOST"))) {
+
+				if (!lQASession.getCreatedBy().equalsIgnoreCase(pAttendee.getUserId()) && mAttendeeDao.getAttendeeByQASessionIdUserId(pQASessionId,
+						pAttendee.getUserId()) == null) {
+					pAttendee.setQASessionId(pQASessionId);
+					
+					if(pAttendee.getQASessionRole().equalsIgnoreCase("HOST"))
+					{
+						pAttendee.setQASessionRole("HOST");
+					}  // if
+					else
+					{
+						pAttendee.setQASessionRole("ATTENDEE");
+					}  // else
+					
+					return Response.ok()
+							.entity(mAttendeeDao.createAttendee(pAttendee))
+							.build();
+				} // if
+				else {
+					Response.status(Response.Status.FORBIDDEN)
+							.entity("{\"status\":\"forbidden\", \"message\":\"Original Host of the session cannot be modified/deleted\"}")
+							.build();
+				} // else
 			} // if
 			return Response
 					.status(Response.Status.FORBIDDEN)
@@ -178,17 +222,28 @@ public class AttendeeService {
 			Attendee lAttendee = mAttendeeDao.getAttendeeByQASessionIdUserId(
 					pQASessionId, lUserInfo.getUserId());
 
-            QASession lQASession = mQASessionDao.getQASessionById(pQASessionId);
-			
-			if (lUserInfo.getUserRole().equals("ADMIN") || 
-					(lAttendee != null && lQASession.getQASessionStatus().equalsIgnoreCase("OPEN") && lAttendee.getQASessionRole().equals("HOST"))) {
-				mAttendeeDao.deleteAttendeeByQASessionIdUserId(pQASessionId,
-						pUserId);
+			QASession lQASession = mQASessionDao.getQASessionById(pQASessionId);
 
-				return Response.ok().entity("{\"status\":\"success\"}").build();
+			if (lUserInfo.getUserRole().equals("ADMIN")
+					|| (lAttendee != null
+							&& lQASession.getQASessionStatus()
+									.equalsIgnoreCase("OPEN") && lAttendee
+							.getQASessionRole().equals("HOST"))) {
+				if (!lQASession.getCreatedBy().equalsIgnoreCase(pUserId)) {
+					mAttendeeDao.deleteAttendeeByQASessionIdUserId(
+							pQASessionId, pUserId);
+
+					return Response.ok().entity("{\"status\":\"success\"}")
+							.build();
+				} // if
+				else {
+					Response.status(Response.Status.FORBIDDEN)
+							.entity("{\"status\":\"forbidden\", \"message\":\"Original Host of the session cannot be modified/deleted\"}")
+							.build();
+				} // else
 
 			} // if
-			
+
 			return Response
 					.status(Response.Status.FORBIDDEN)
 					.entity("{\"status\":\"forbidden\", \"message\":\"user does not have the previliege to perform the particular action\"}")

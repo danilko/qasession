@@ -30,8 +30,6 @@ var NANESPACE_QA_SESSION = {
 		$("#divSessionDetail").hide();
 		$("#divSessionList").hide();
 
-		NANESPACE_QA_SESSION.getCurrentUserInfo();
-
 		$.ajax({
 			type : 'GET',
 			url : 'rest/qasession/',
@@ -107,7 +105,7 @@ var NANESPACE_QA_SESSION = {
 
 		return lCurrentUserInfo;
 	},
-	getUserTranslate : function(userId) {
+	getAllUserTranslates : function() {
 		var lUserTranslates = NANESPACE_QA_SESSION
 				.getCacheObject("userTranslates");
 
@@ -125,6 +123,12 @@ var NANESPACE_QA_SESSION = {
 				} // success
 			});
 		} // if
+
+		return lUserTranslates;
+	},
+	getUserTranslate : function(userId) {
+		lUserTranslates = NANESPACE_QA_SESSION.getAllUserTranslates();
+
 		var lUserTranslate = null;
 		$.each(lUserTranslates, function(i, userTranslate) {
 			// Find the target userTranslate, break the loop
@@ -188,7 +192,31 @@ var NANESPACE_QA_SESSION = {
 							$("#existSessionSessionStatus").disabled = false;
 
 							$("#buttonExistSessionSaveExistSession").show();
-						} // if 
+
+							var lUserTranslates = NANESPACE_QA_SESSION
+									.getAllUserTranslates();
+
+							$
+									.each(
+											lUserTranslates,
+											function(i, userTranslate) {
+												$(
+														"#existSessionSessionNewAttendeeUserId")
+														.append(
+																$("<option/>")
+																		.val(
+																				userTranslate.userId)
+																		.text(
+																				userTranslate.name));
+											});
+
+							$("#buttonAddNewAttendee").attr(
+									"onClick",
+									"NANESPACE_QA_SESSION.saveAttendee('"
+											+ data.qasessionId + "');");
+
+							$("#divAddNewAttendee").show();
+						} // if
 						else {
 							$("#existSessionSessionTopic").disabled = true;
 							;
@@ -197,7 +225,19 @@ var NANESPACE_QA_SESSION = {
 							$("#existSessionSessionStatus").disabled = true;
 
 							$("#buttonExistSessionSaveExistSession").hide();
+
+							$("#existSessionSessionNewAttendeeUserId").empty();
+
+							$("#divAddNewAttendee").hide();
 						} // else
+
+						$("#divSessionDetailAttendees").empty();
+
+						if (data.attendees.length > 0) {
+							$.each(data.attendees, function(i, attendee) {
+								NANESPACE_QA_SESSION.showAttendee(attendee);
+							});
+						} // if
 
 						$("#buttonSessionCreateQuestion").attr(
 								"onClick",
@@ -206,8 +246,9 @@ var NANESPACE_QA_SESSION = {
 
 						$("#sessionQuestionContent").val("");
 
+						$("#divSessionDetailQuestions").empty();
+
 						if (data.questions.length > 0) {
-							$("#divSessionDetailQuestions").empty();
 							$.each(data.questions, function(i, question) {
 								NANESPACE_QA_SESSION.showQuestion(question);
 							});
@@ -396,7 +437,22 @@ var NANESPACE_QA_SESSION = {
 					+ question.questionId
 					+ "' class=\"form-control\" rows=\"5\">"
 					+ question.questionContent
-					+ "</textarea></div><div class=\"text-right\">";
+					+ "</textarea>";
+			
+			questionSection = questionSection + "<br/><select class=\"form-control\" id='divSelectEditQuestion_"
+					+ question.questionId
+					+ "'>";
+			
+			// Reorder select order based on current status
+			if(question.questionStatus == "OPEN")
+			{
+				questionSection = questionSection + "<option value=\"OPEN\">OPEN</option><option value=\"CLOSE\">CLOSE</option>";
+			}  // if
+			else
+			{
+				questionSection = questionSection + "<option value=\"CLOSE\">CLOSE</option><option value=\"OPEN\">OPEN</option>";
+			}  // else
+			uestionSection = questionSection + "</select></div><div class=\"text-right\">";
 
 			if ((question.answers.length == 0)
 					&& (currentUserAttendee != null && currentUserAttendee.qasessionRole == "HOST")) {
@@ -585,7 +641,8 @@ var NANESPACE_QA_SESSION = {
 	saveQuestion : function(qasessionId, questionId) {
 
 		var questionObject = new Object();
-		questionObject.questionStatus = "OPEN";
+		questionObject.questionStatus = $("#divSelectEditQuestion_" + questionId).val();
+		
 		questionObject.questionContent = $(
 				"#textareaEditQuestion_" + questionId).val();
 
@@ -823,6 +880,124 @@ var NANESPACE_QA_SESSION = {
 					}
 				});
 	}, // deleteSession : function()
+	showAttendee : function(attendee) {
+
+		var currentUserAttendee = NANESPACE_QA_SESSION
+				.getAttendeeByAttendeeId(NANESPACE_QA_SESSION
+						.getCurrentUserInfo().userId);
+
+		$("#tbtrAttendee_" + attendee.userId).remove();
+
+		attendeeSection = "<tr id = \"tbtrAttendee_" + attendee.userId
+				+ "\"><td>"
+				+ NANESPACE_QA_SESSION.getUserTranslate(attendee.userId).name
+				+ "</td><td>" + attendee.qasessionRole + "</td><td>";
+
+		if (currentUserAttendee.qasessionRole == "HOST") {
+			attendeeSection = attendeeSection
+					+ "<a href=\"#\" onClick=\"NANESPACE_QA_SESSION.deleteAttendee('"
+					+ attendee.qasessionId
+					+ "','"
+					+ attendee.userId
+					+ "')\"><span class=\"glyphicon glyphicon-trash\"></span></a>";
+		} // if
+
+		attendeeSection = attendeeSection + "</td></tr>";
+		$("#tbodySessionDetailAttendees").append(attendeeSection);
+	},
+	saveAttendee : function(qasessionId) {
+
+		var userId = $("#existSessionSessionNewAttendeeUserId").val();
+		
+		var attendeeObject = new Object();
+		attendeeObject.qasessionRole = $("#existSessionSessionNewAttendeeAttendeeRole").val();
+		attendeeObject.userId = userId;
+
+		if ($("#tbodyAttendees" + userId).length == 0) {
+			$
+					.ajax({
+						type : 'POST',
+						url : 'rest/qasession/' + qasessionId + "/attendee/",
+						contentType : 'application/json',
+						data : JSON.stringify(attendeeObject),
+						dataType : 'json',
+						success : function(data) {
+							NANESPACE_QA_SESSION.showAttendee(data);
+
+							NANESPACE_QA_SESSION.addSessionAlert("SUCCESS",
+									"The attendee is added now.");
+
+						}, // success
+						error : function(jqXHR, textStatus, errorThrown) {
+							alertMessage = "";
+							if (jqXHR.status == 403) {
+								alertMessage = "This operation is not allowed"
+							} // if
+							else {
+								alertMessage = "There is something wrong with backend, please try again later."
+							} // else
+							NANESPACE_QA_SESSION.addSessionAlert("FAILURE",
+									alertMessage);
+						}
+					});
+		} // if
+		else {
+			$
+					.ajax({
+						type : 'PUT',
+						url : 'rest/qasession/' + qasessionId + "/attendee/"
+								+ userId,
+						contentType : 'application/json',
+						data : JSON.stringify(attendeeObject),
+						dataType : 'json',
+						success : function(data) {
+							NANESPACE_QA_SESSION.showAttendee(data);
+							NANESPACE_QA_SESSION.addSessionAlert("SUCCESS",
+									"The attendee is updated now.");
+
+						}, // success
+						error : function(jqXHR, textStatus, errorThrown) {
+							alertMessage = "";
+							if (jqXHR.status == 403) {
+								alertMessage = "This operation is not allowed"
+							} // if
+							else {
+								alertMessage = "There is something wrong with backend, please try again later."
+							} // else
+							NANESPACE_QA_SESSION.addSessionAlert("FAILURE",
+									alertMessage);
+						}
+					});
+		} // else
+	}, // createQuestion : function()
+	deleteAttendee : function(qasessionId, userId) {
+		$
+				.ajax({
+					type : 'DELETE',
+					url : 'rest/qasession/' + qasessionId + "/attendee/"
+							+ userId,
+					contentType : 'application/json',
+					dataType : 'json',
+					success : function(data) {
+						$("#tbtrAttendee_" + userId).remove();
+
+						NANESPACE_QA_SESSION.addSessionAlert("SUCCESS",
+								"The attendee is removed now.");
+
+					}, // success
+					error : function(jqXHR, textStatus, errorThrown) {
+						alertMessage = "";
+						if (jqXHR.status == 403) {
+							alertMessage = "This operation is not allowed"
+						} // if
+						else {
+							alertMessage = "There is something wrong with backend, please try again later."
+						} // else
+						NANESPACE_QA_SESSION.addSessionAlert("FAILURE",
+								alertMessage);
+					}
+				});
+	}, // createQuestion : function()
 	displayAllSession : function(qasessionId) {
 	}, // displayAllSession
 	logoutUser : function() {
