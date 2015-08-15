@@ -122,3 +122,8 @@ API documentation can be found at
 http://<hostname>/controller/api
 ```
 
+Screenshots
+===============
+[![All QASession Belong to User](https://raw.githubusercontent.com/danilko/qasession/master/screenshots/screenshot1.png)](https://raw.githubusercontent.com/danilko/qasession/master/screenshots/screenshot1.png)
+[![QASession Modification1](https://raw.githubusercontent.com/danilko/qasession/master/screenshots/screenshot2.png)](https://raw.githubusercontent.com/danilko/qasession/master/screenshots/screenshot2.png)
+[![QASession Modification2](https://raw.githubusercontent.com/danilko/qasession/master/screenshots/screenshot3.png)](https://raw.githubusercontent.com/danilko/qasession/master/screenshots/screenshot3.png)

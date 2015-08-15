@@ -452,7 +452,7 @@ var NANESPACE_QA_SESSION = {
 			{
 				questionSection = questionSection + "<option value=\"CLOSE\">CLOSE</option><option value=\"OPEN\">OPEN</option>";
 			}  // else
-			uestionSection = questionSection + "</select></div><div class=\"text-right\">";
+			questionSection = questionSection + "</select></div><div class=\"text-right\">";
 
 			if ((question.answers.length == 0)
 					&& (currentUserAttendee != null && currentUserAttendee.qasessionRole == "HOST")) {
